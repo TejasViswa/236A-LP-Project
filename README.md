@@ -18,4 +18,5 @@
 - sklearn Module
   - `pip install sklearn`
 - Download all the files in the folder and keep them in the same workspace
-- Run the `Higher_Education_Chatbot.py` file on your python IDE
+- Also download the [MNIST Train Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=train.csv) and [MNIST Test Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=test.csv) and keep them in the same workspace
+- Run the `Untitled2.py` file on your ipython IDE
