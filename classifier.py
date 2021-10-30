@@ -24,10 +24,15 @@ class myclassifier:
 
     def f(self,input):
         """
-        Returns:
+        input = this is the input vector to f(.), which corresponds to the function g(y) = W'*y + w which is an L dimensional vector
+        Return:
             Output is an estimated class
         """
-        np.dot(input,self.W) + self.w
-
+        # Let us first define a variable for the function g(y) = W'*y + w
+        g = np.matrix.dot(self.W.getT(),self.w)
+        
+        # We return estimated class as +1 or -1 when g is non-negative and negative respectively
+        return 1 if g >= 0 else -1
+        
     def test(self):
         pass
