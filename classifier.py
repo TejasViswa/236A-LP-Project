@@ -1,14 +1,22 @@
 import numpy as np
+import pandas as pd
 
-class myclassifier:
+class MyClassifier_25:
     def __init__(self,dataset = np.zeros((100,785))):
-        if not isinstance(x, pd.DataFrame):
+        
+        # By default, a 100 x 785 zero matrix is taken as dataset
+        if not isinstance(dataset, pd.DataFrame):
             dataset = np.zeros((100,785))
             print("Dataset is not a Pandas DataFrame")
-        self.train_data, self.train_label = train.drop(labels = ["label"],axis = 1).to_numpy(), train["label"]
-        # Assuming L is 1, which makes W as (m features x 1) vector and w as scalar
-        self.W = np.zeros((self.train_data.shape,1))
+        
+        # Separating training data and training label
+        self.train_data, self.train_label = dataset.drop(labels = ["label"],axis = 1).to_numpy(), dataset["label"]
+        
+        # W is matrix of m rows and L columns and w is a L - dimensional vector
+        # Assuming L is 1, which makes W as (m features x 1) vector and w as scalar:
+        self.W = np.zeros((self.train_data.shape[1],1))
         self.w = np.zeros(1)
+
 
     def sample_selection(self,training_sample):
         """
@@ -22,15 +30,15 @@ class myclassifier:
 #             print("Sample is not a Pandas DataFrame")
 
         # Separate Features and Labels
-        sample_X,sample_Y = training_sample.drop(labels = ["label"],axis = 1).to_numpy(), training_sample["label"]
+        sample_X,sample_Y = training_sample[:-1], training_sample[-1]
         
         # Some logic to check if sample data is useful
         logic = True
         
         # Updating training dataset after verifying some logic
-        if(logic)
-            self.train_data.append(sample_X)
-            self.train_label.append(sample_Y)
+        if(logic):
+            self.train_data = np.vstack([self.train_data,sample_X])
+            self.train_label = np.vstack([self.train_label,sample_X])
         
         return self
 
