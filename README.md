@@ -5,6 +5,7 @@
 - [SVM Classifier from scratch](https://towardsdatascience.com/svm-implementation-from-scratch-python-2db2fc52e5c2)
 - https://link.springer.com/article/10.1007%2Fs13755-017-0023-z
 - https://towardsdatascience.com/the-5-sampling-algorithms-every-data-scientist-need-to-know-43c7bc11d17c
+- https://bmcmedinformdecismak.biomedcentral.com/articles/10.1186/1472-6947-12-8
 
 ## Prerequisites:
 - Python environment with python version 3.0 or higher
