@@ -3,15 +3,15 @@ import pandas as pd
 import cvxpy as cp
 import random
 
-# Load the entire dataset in csv format
-dataset = pd.read_csv('/Path/to/train/mnist_train.csv')
-    
-# Load the test data path
-test_dataset = pd.read_csv('/Path/to/test/mnist_test.csv')
 
-class MyClassifier_25:   
+
+class MyClassifier_25:  
+
+    def __init__(self,dataset) -> None:
+        self.w = None
+        self.b = None
     
-    def prepare_binary(class1:int,class2:int):
+    def prepare_binary(self,dataset,class1:int,class2:int):
 
         #USAGE    
         # Since we have to deal with a binary classifier to diffrentiate between digits 7 and 1, 
@@ -40,10 +40,9 @@ class MyClassifier_25:
 
 
     def sample_selection(self,training_sample):
+        pass
 
-        ##Yet to write
-
-    def train(train_data,train_label):
+    def train(self,traindata,trainlabel):
         
         #USAGE
         # W, w = train(traindata, trainlabel)
@@ -84,7 +83,15 @@ class MyClassifier_25:
         
         # Solving the problem would give us the optimal values from W and w;
         # which have to be returned, so that we can use them while testing
+
+        ## adding to class variable
+        self.w = W
+        self.b = w
         return W, w
 
+    def f(self,test_input):
+        pass
+
     def test(self):
-        ##Yet to add
+        pass
+
