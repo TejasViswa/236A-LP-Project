@@ -41,7 +41,7 @@ class MyClassifier_25:
 
     def sample_selection(self,training_sample):
 
-        #Yet to write
+        ##Yet to write
 
     def train(train_data,train_label):
         
