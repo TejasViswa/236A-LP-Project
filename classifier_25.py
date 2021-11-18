@@ -61,6 +61,7 @@ class MyClassifier_25:
 
         ## Ideally we will have to try using different values fro "lambda"
         ## For the sake of testing the code, we have set it to 0.01
+        ## Do we need to have a lambda?
         lambd = 0.01 
         reg_loss = cp.norm(W,p=2)**2
         
