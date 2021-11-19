@@ -16,4 +16,4 @@
 - [Online support vector machine based on convex hull vertices selection](https://pubmed.ncbi.nlm.nih.gov/24808380/)
 - [The Huller: A Simple and Efficient Online SVM](https://link.springer.com/content/pdf/10.1007/11564096_48.pdf)    
 - [ Online training of support vector classifier](https://www.sciencedirect.com/science/article/pii/S0031320303000384)
-- 
+- [Active Learning with Support Vector Machines](http://image.diku.dk/jank/papers/WIREs2014.pdf)
