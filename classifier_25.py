@@ -18,7 +18,7 @@ class MyClassifier_25:
         # we choose only those examples.
         # If asked to train a classifier on any other pair a, b (say),
         # please pass the right arguments to the following function as follows:
-        # trainlabel, traindata, train_data_target_df = prepare_binary(a,b)
+        # trainlabel, traindata, dataTargetDf = prepare_binary(a,b)
 
 
         # We now assign +1 to one class and -1 to the other;
@@ -43,7 +43,7 @@ class MyClassifier_25:
 
 
         ##If randomizing the order, should we use the dataframe 'finalDf'?
-        return trainlabel,traindata, finalDf
+        return trainlabel, traindata, dataTargetDf
 
 
     def sample_selection(self,training_sample):
