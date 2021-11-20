@@ -3,15 +3,27 @@ import pandas as pd
 import cvxpy as cp
 import random
 
+from pandas.io.pytables import performance_doc
+
 
 
 class MyClassifier_25:  
 
-    def __init__(self,dataset) -> None:
+    def __init__(self,dataset,class1:int,class2:int) -> None:
         self.w = None
         self.b = None
+        self.classes = { 1 : class1, -1: class2}
+        self.dataset_train = dataset
+
+        #data prep
+        self.traindata, self.trainlabel = self.prepare_binary(self.dataset_train)
+        
+        #train the classfier 
+        self.train(self.traindata,self.trainlabel)
+
+        
     
-    def prepare_binary(self,dataset,class1:int,class2:int):
+    def prepare_binary(self,dataset):
 
         #USAGE    
         # Since we have to deal with a binary classifier to diffrentiate between digits 7 and 1, 
@@ -23,6 +35,9 @@ class MyClassifier_25:
 
         # We now assign +1 to one class and -1 to the other;
         # Therefore +1 and -1 will be the new labels
+        class1 = self.classes[1]
+        class2 = self.classes[-1]
+
         trainlabel = dataset.loc[(dataset['label']== class1)  | (dataset['label']== class2) ]['label']
         trainlabel.loc[trainlabel == class1] = +1
         trainlabel.loc[trainlabel == class2] = -1
@@ -35,17 +50,21 @@ class MyClassifier_25:
         traindata = dataset.loc[(dataset['label']== class1)  | (dataset['label']== class2) ]
         traindata = traindata.drop(labels = ["label"],axis = 1).to_numpy()
         
+        
+
+        return trainlabel, traindata
+
+    def target_df(self,traindata,trainlabel):
         # Also creating a dataframe with these, so that we can randomize the order of the train data when needed without
         # losing the mapping between feature vectors and the target labels
         trainDf=pd.DataFrame(traindata)
         targetDf=pd.DataFrame(trainlabel,columns=['target'])
+        
         dataTargetDf = pd.concat([trainDf, targetDf[['target']]], axis = 1)
-
-
         ##If randomizing the order, should we use the dataframe 'finalDf'?
-        return trainlabel, traindata, dataTargetDf
+        return dataTargetDf
 
-    def subset(dataTargetDf, subsetfrac:float):
+    def subset(self,dataTargetDf, subsetfrac:float):
         
         # Usage: If 20% of the data is to be randomly selected
         # subsetDf = subset(dataTargetDf, 0.2)
@@ -101,12 +120,39 @@ class MyClassifier_25:
         ## adding to class variable
         self.w = W
         self.b = w
-        return W, w
+        
 
     def f(self,test_input):
         test_val = test_input.dot(self.w.value) +  self.b.value
-        if test
+        if test_val < -1:
+            test_val -1
+        elif test_val > 1:
+            test_val = 1
+        
+        estimated_class = self.classes.get(self.f(test_input))
+        return estimated_class
+    
+    def assess_classifier_performance(self,performance):
+        performance = np.asarray(performance)
+        correct = (np.count_nonzero(performance)/len(performance))*100
+        return correct
 
-    def test(self):
-        pass
+    def test(self,dataset_test):
+        testlabel,testdata= self.prepare_binary(dataset_test)
+        res = []
+        performance = []
+        for i in range(testdata.shape[0]):
+            result = self.f(testdata[i])
+            res.append(result)
+
+            ## assessing performance
+            if result == testlabel[i][0]:
+                performance.append[1]
+            else:
+                performance.append[0]
+        return res, performance
+        
+
+
+        
 
