@@ -12,7 +12,7 @@ class MyClassifier_25:
     def __init__(self,dataset,class1:int,class2:int) -> None:
         self.w = None
         self.b = None
-        self.classes = { 1 : class1, -1: class2}
+        self.classes = { 1 : class1, -1: class2, 0:None}
         self.dataset_train = dataset
 
         #data prep
@@ -101,7 +101,7 @@ class MyClassifier_25:
         reg_loss = cp.norm(W,p=2)**2
         
         #hinge loss
-        # hinge_loss = cp.sum(cp.pos(1-cp.multiply(trainlabel,traindata @ W + w)))
+        hinge_loss = cp.sum(cp.pos(1-cp.multiply(trainlabel,traindata @ W + w)))
         
         #Constraint
         # For every feature vector traindata[i] and its corresponding label trainlabel[i]:
@@ -128,10 +128,11 @@ class MyClassifier_25:
     def f(self,test_input):
         test_val = test_input.dot(self.w.value) +  self.b.value
         if test_val < -1:
-            test_val -1
+            test_val= -1
         elif test_val > 1:
             test_val = 1
-        
+        else:
+            test_val = 0
         estimated_class = self.classes.get(test_val)
         return estimated_class
     
@@ -149,11 +150,11 @@ class MyClassifier_25:
             result = self.f(testdata[i])
             res.append(result)
 
-            ## assessing performance
-            if result == testlabel[i]:#[0]:
-                performance.append[1]
+            
+            if result == testlabel[i]: #[0]:
+                performance.append(1)
             else:
-                performance.append[0]
+                performance.append(0)
         return res, performance
     
     def plot_classifier_performance_vs_number_of_samples(self):
