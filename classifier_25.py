@@ -16,7 +16,7 @@ class MyClassifier_25:
         self.dataset_train = dataset
 
         #data prep
-        self.traindata, self.trainlabel = self.prepare_binary(self.dataset_train)
+        self.trainlabel,self.traindata = self.prepare_binary(self.dataset_train)
         
         #train the classfier 
         self.train(self.traindata,self.trainlabel)
@@ -39,18 +39,20 @@ class MyClassifier_25:
         class2 = self.classes[-1]
 
         trainlabel = dataset.loc[(dataset['label']== class1)  | (dataset['label']== class2) ]['label']
-        trainlabel.loc[trainlabel == class1] = +1
+        trainlabel.loc[trainlabel == class1] = 1
         trainlabel.loc[trainlabel == class2] = -1
         trainlabel = trainlabel.to_numpy()
     
         #In order to match dimensions of "traindata" and "trainlabel", we convert trainlabel to two dimension array
-        trainlabel= np.reshape(trainlabel, (trainlabel.shape[0],1))   
+        # trainlabel= np.reshape(trainlabel, (trainlabel.shape[0],1))   
 
         # We now extract the features for the two classes
         traindata = dataset.loc[(dataset['label']== class1)  | (dataset['label']== class2) ]
         traindata = traindata.drop(labels = ["label"],axis = 1).to_numpy()
-        
-        
+
+        # print(traindata.shape[1])
+
+
 
         return trainlabel, traindata
 
@@ -81,6 +83,7 @@ class MyClassifier_25:
 
         # m: Number of feature vectors
         # W and w: Weight vector and Bias value respectively
+        print(traindata.shape)
         m = traindata.shape[1]
         W = cp.Variable((m,1))
         w = cp.Variable()
@@ -98,7 +101,7 @@ class MyClassifier_25:
         reg_loss = cp.norm(W,p=2)**2
         
         #hinge loss
-        hinge_loss = cp.sum(cp.pos(1-cp.multiply(trainlabel,traindata @ W + w)))
+        # hinge_loss = cp.sum(cp.pos(1-cp.multiply(trainlabel,traindata @ W + w)))
         
         #Constraint
         # For every feature vector traindata[i] and its corresponding label trainlabel[i]:
@@ -107,10 +110,10 @@ class MyClassifier_25:
         ##Check the dimensions in the above constraint equation
         
         #Objective is to minimize reg_loss and hinge_loss
-        objective_func = cp.Minimize(hinge_loss/m + lambd*reg_loss)
-    
-        # Now framing the LP, along with the constraints
+        # objective_func = cp.Minimize(hinge_loss/m + lambd*reg_loss)
+        objective_func = cp.Minimize(0.5*cp.norm(W,p=2)**2)
         prob = cp.Problem(objective_func,constraints=const)
+        # Now framing the LP, along with the constraints
 
         prob.solve()
         
@@ -129,7 +132,7 @@ class MyClassifier_25:
         elif test_val > 1:
             test_val = 1
         
-        estimated_class = self.classes.get(self.f(test_input))
+        estimated_class = self.classes.get(test_val)
         return estimated_class
     
     def assess_classifier_performance(self,performance):
@@ -141,16 +144,22 @@ class MyClassifier_25:
         testlabel,testdata= self.prepare_binary(dataset_test)
         res = []
         performance = []
+        print("3 !!!!!!!!!!!",testdata[3])
         for i in range(testdata.shape[0]):
             result = self.f(testdata[i])
             res.append(result)
 
             ## assessing performance
-            if result == testlabel[i][0]:
+            if result == testlabel[i]:#[0]:
                 performance.append[1]
             else:
                 performance.append[0]
         return res, performance
+    
+    def plot_classifier_performance_vs_number_of_samples(self):
+        pass
+
+    
         
 
 
