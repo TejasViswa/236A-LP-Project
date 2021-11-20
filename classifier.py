@@ -53,7 +53,7 @@ class MyClassifier_25:
         
         # calculate hinge loss
         N = train_data.shape[0]
-        distances = 1 - f(train_label) * np.matrix.dot(self.W.getT(),train_label) + self.w
+        distances = 1 - self.f(train_label) * np.matrix.dot(self.W.getT(),train_label) + self.w
         distances[distances < 0] = 0  # equivalent to max(0, distance)
         hinge_loss = reg_strength * (np.sum(distances) / N)
 
