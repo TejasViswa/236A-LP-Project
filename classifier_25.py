@@ -45,6 +45,12 @@ class MyClassifier_25:
         ##If randomizing the order, should we use the dataframe 'finalDf'?
         return trainlabel, traindata, dataTargetDf
 
+    def subset(dataTargetDf, subsetfrac:float):
+        
+        # Usage: If 20% of the data is to be randomly selected
+        # subsetDf = subset(dataTargetDf, 0.2)
+        
+        return dataTargetDf.sample(frac = subsetfrac)
 
     def sample_selection(self,training_sample):
         pass
