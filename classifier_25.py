@@ -91,7 +91,8 @@ class MyClassifier_25:
         return W, w
 
     def f(self,test_input):
-        pass
+        test_val = test_input.dot(self.w.value) +  self.b.value
+        if test
 
     def test(self):
         pass

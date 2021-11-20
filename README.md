@@ -17,3 +17,6 @@
 - [The Huller: A Simple and Efficient Online SVM](https://link.springer.com/content/pdf/10.1007/11564096_48.pdf)    
 - [ Online training of support vector classifier](https://www.sciencedirect.com/science/article/pii/S0031320303000384)
 - [Active Learning with Support Vector Machines](http://image.diku.dk/jank/papers/WIREs2014.pdf)
+- [SVM-Based Spam Filter with Active and Online Learning](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.109.5961&rep=rep1&type=pdf)
+- [Reducing the Number of Training Samples for Fast Support Vector Machine Classification](https://www.researchgate.net/profile/Saman-Halgamuge/publication/235009071_Reducing_the_number_of_training_samples_for_Fast_Support_Vector_Machine_Classification/links/0f31752ee3e62e4790000000/Reducing-the-number-of-training-samples-for-Fast-Support-Vector-Machine-Classification.pdf)
+- 
