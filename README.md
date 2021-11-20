@@ -19,5 +19,6 @@
 - [Active Learning with Support Vector Machines](http://image.diku.dk/jank/papers/WIREs2014.pdf)
 - [SVM-Based Spam Filter with Active and Online Learning](https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.109.5961&rep=rep1&type=pdf)
 - [Reducing the Number of Training Samples for Fast Support Vector Machine Classification](https://www.researchgate.net/profile/Saman-Halgamuge/publication/235009071_Reducing_the_number_of_training_samples_for_Fast_Support_Vector_Machine_Classification/links/0f31752ee3e62e4790000000/Reducing-the-number-of-training-samples-for-Fast-Support-Vector-Machine-Classification.pdf)
--[SVM Presentation](https://edisciplinas.usp.br/pluginfile.php/5078086/course/section/5978682/svm2.pdf)
--[Online Learning: A Comprehensive Survey](https://arxiv.org/pdf/1802.02871.pdf)
+- [SVM Presentation](https://edisciplinas.usp.br/pluginfile.php/5078086/course/section/5978682/svm2.pdf)
+- [Online Learning: A Comprehensive Survey](https://arxiv.org/pdf/1802.02871.pdf)
+- [Reduction of Training Data Using Parallel Hyperplane for Support Vector Machine](https://www.tandfonline.com/doi/full/10.1080/08839514.2019.1583449?scroll=top&needAccess=true)
