@@ -39,7 +39,7 @@ class MyClassifier_25:
         # losing the mapping between feature vectors and the target labels
         trainDf=pd.DataFrame(traindata)
         targetDf=pd.DataFrame(trainlabel,columns=['target'])
-        finalDf = pd.concat([trainDf, targetDf[['target']]], axis = 1)
+        dataTargetDf = pd.concat([trainDf, targetDf[['target']]], axis = 1)
 
 
         ##If randomizing the order, should we use the dataframe 'finalDf'?
