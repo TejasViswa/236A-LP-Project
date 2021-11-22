@@ -163,9 +163,10 @@ class MyClassifier_25:
         for i in range(testdata.shape[0]):
             result = self.f(testdata[i])
             res.append(result)
-
             
-            if result == testlabel[i][0]:
+            actual_class = self.classes.get(int(testlabel[i]))
+            
+            if result == actual_class:
                 performance.append(1)
             else:
                 performance.append(0)
