@@ -44,7 +44,8 @@ class MyClassifier_25:
         trainlabel = trainlabel.to_numpy()
     
         #In order to match dimensions of "traindata" and "trainlabel", we convert trainlabel to two dimension array
-        # trainlabel= np.reshape(trainlabel, (trainlabel.shape[0],1))   
+        # for hinge loss
+        trainlabel= np.reshape(trainlabel, (trainlabel.shape[0],1))   
 
         # We now extract the features for the two classes
         traindata = dataset.loc[(dataset['label']== class1)  | (dataset['label']== class2) ]
@@ -75,6 +76,44 @@ class MyClassifier_25:
 
     def sample_selection(self,training_sample):
         pass
+    
+    def _hinge_loss_svm(self,traindata, trainlabel,W,w):
+        m =traindata.shape[1]
+        # Equation for the regularizer.
+        # It is the lambda*(norm2 of W)**2
+        # Here "lambda" is a non negative constant
+        lambd = cp.Parameter(nonneg=True)
+
+        ## Ideally we will have to try using different values fro "lambda"
+        ## For the sake of testing the code, we have set it to 0.01
+        ## Do we need to have a lambda?
+        lambd = 0.01 
+        reg_loss = cp.norm(W,p=2)**2
+        
+        #hinge loss
+        hinge_loss = cp.sum(cp.pos(1-cp.multiply(trainlabel,traindata @ W - w)))
+        
+
+        
+        #Objective is to minimize reg_loss and hinge_loss
+        # objective_func = cp.Minimize(hinge_loss/m + lambd*reg_loss)
+        prob = cp.Problem(cp.Minimize(hinge_loss/m + lambd*reg_loss))
+        # Now framing the LP, along with the constraints
+        return prob
+
+    def _normal_loss_svm(self,traindata,trainlabel, W,w):
+        #Constraint
+        # For every feature vector traindata[i] and its corresponding label trainlabel[i]:
+        # W^T*traindata[i] + w >= 1
+        const = [trainlabel[i]*(traindata[i]@ W + w) >= 1 for i in range(traindata.shape[0])]
+        ##Check the dimensions in the above constraint equation
+        
+        #Objective is to minimize reg_loss and hinge_loss
+        # objective_func = cp.Minimize(hinge_loss/m + lambd*reg_loss)
+        objective_func = cp.Minimize(0.5*cp.norm(W,p=2)**2)
+        prob = cp.Problem(objective_func,constraints=const)
+        # Now framing the LP, along with the constraints
+        return prob
 
     def train(self,traindata,trainlabel):
         
@@ -89,31 +128,7 @@ class MyClassifier_25:
         w = cp.Variable()
 
         
-        # Equation for the regularizer.
-        # It is the lambda*(norm2 of W)**2
-        # Here "lambda" is a non negative constant
-        lambd = cp.Parameter(nonneg=True)
-
-        ## Ideally we will have to try using different values fro "lambda"
-        ## For the sake of testing the code, we have set it to 0.01
-        ## Do we need to have a lambda?
-        lambd = 0.01 
-        reg_loss = cp.norm(W,p=2)**2
-        
-        #hinge loss
-        hinge_loss = cp.sum(cp.pos(1-cp.multiply(trainlabel,traindata @ W + w)))
-        
-        #Constraint
-        # For every feature vector traindata[i] and its corresponding label trainlabel[i]:
-        # W^T*traindata[i] + w >= 1
-        const = [trainlabel[i]*(traindata[i]@ W + w) >= 1 for i in range(traindata.shape[0])]
-        ##Check the dimensions in the above constraint equation
-        
-        #Objective is to minimize reg_loss and hinge_loss
-        # objective_func = cp.Minimize(hinge_loss/m + lambd*reg_loss)
-        objective_func = cp.Minimize(0.5*cp.norm(W,p=2)**2)
-        prob = cp.Problem(objective_func,constraints=const)
-        # Now framing the LP, along with the constraints
+        prob = self._hinge_loss_svm(traindata,trainlabel,W,w)
 
         prob.solve()
         
@@ -126,7 +141,7 @@ class MyClassifier_25:
         
 
     def f(self,test_input):
-        test_val = test_input.dot(self.w.value) +  self.b.value
+        test_val = test_input.dot(self.w.value) -  self.b.value
         if test_val < -1:
             test_val= -1
         elif test_val > 1:
@@ -145,13 +160,12 @@ class MyClassifier_25:
         testlabel,testdata= self.prepare_binary(dataset_test)
         res = []
         performance = []
-        print("3 !!!!!!!!!!!",testdata[3])
         for i in range(testdata.shape[0]):
             result = self.f(testdata[i])
             res.append(result)
 
             
-            if result == testlabel[i]: #[0]:
+            if result == testlabel[i][0]:
                 performance.append(1)
             else:
                 performance.append(0)
