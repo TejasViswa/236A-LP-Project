@@ -172,6 +172,15 @@ class MyClassifier_25:
                 performance.append(0)
         return res, performance
     
+    def scheduler(self):
+        pass
+
+    def compute_datapoint_distance(self):
+        pass
+
+    def pass_training_datapoint(self):
+        pass
+    
     def plot_classifier_performance_vs_number_of_samples(self):
         pass
 
