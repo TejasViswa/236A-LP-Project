@@ -107,26 +107,28 @@ class MyClassifier_25:
 
         print("mini_start: ",mini_start,"mini_end: ", mini_end)
         print("Mini Batch: ",self.sel_arr[mini_start:mini_end])
-        
+
+
+        # Returns True if sample is accepted and False otherwise
+        # return True if accept_sample == 1 else False
+        #         
         # EXPLORE =====================================================================
         # Random Binary value is assigned initially
         accept_sample = random.randint(0, 1)
+        # lbl, dt = self.prepare_binary(training_sample)
+        # # EXPLOIT =====================================================================
+        # # after 50 percent completion, choose p1 and p3 over p2
+        # if ((self.i/self.dataset_train.shape[0])>=0.5 and (self.i/self.dataset_train.shape[0])<0.75 and \
+        #     np.count_nonzero(self.sel_arr[mini_start:mini_end]) < self.mini_batch_slots_to_be_filled*self.exploit_perc):
+        #     if(self.region(dt)=='p1' or self.region(dt)=='p3'):
+        #         accept_sample = 1
+        # # after 75 percent completion, choose p2 over p1 and p3
+        # elif ((self.i/self.dataset_train.shape[0])>=0.75 and \
+        #      np.count_nonzero(self.sel_arr[mini_start:mini_end]) < self.mini_batch_slots_to_be_filled*self.exploit_perc):
+        #     if(self.region(dt)=='p3'):
+        #         accept_sample = 1
         
-        lbl, dt = self.prepare_binary(training_sample)
-
-        # EXPLOIT =====================================================================
-        # after 50 percent completion, choose p1 and p3 over p2
-        if ((self.i/self.dataset_train.shape[0])>=0.5 and (self.i/self.dataset_train.shape[0])<0.75 and \
-            np.count_nonzero(self.sel_arr[mini_start:mini_end]) < self.mini_batch_slots_to_be_filled*self.exploit_perc):
-            if(self.region(dt)=='p1' or self.region(dt)=='p3'):
-                accept_sample = 1
-        # after 75 percent completion, choose p2 over p1 and p3
-        elif ((self.i/self.dataset_train.shape[0])>=0.75 and \
-             np.count_nonzero(self.sel_arr[mini_start:mini_end]) < self.mini_batch_slots_to_be_filled*self.exploit_perc):
-            if(self.region(dt)=='p3'):
-                accept_sample = 1
-        
-        # MINI BATCH CREATION =================================================
+        # MINI BATCH CREATION ===========================================================
         # No. of mini batch and batch slots that must be filled to satisfy percentage criteria
         mini_batch_count = np.count_nonzero(self.sel_arr[mini_start:mini_end])
         if mini_batch_count >= self.mini_batch_slots_to_be_filled:
@@ -160,6 +162,7 @@ class MyClassifier_25:
         
         if(self.i==0):
             accept_sample = random.randint(0, 1)
+       
         
         print("accept_sample: ",accept_sample)
         print("~~~~~~~~~~~~~~~~~~~~~~~~")
