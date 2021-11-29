@@ -41,7 +41,13 @@ class MyClassifier_25:
         #train the classfier 
         # self.selection_and_train()
 
+    def reset_training_dataset(self):
+        self.yet_to_train_dataset = self.dataset_train
+        self.sampled_dataset = None
         
+        self.i = 0 # Dataset Iterator 
+        self.sel_arr = np.zeros(self.traindata.shape[0]) # Binary Array indicating whether a sample -
+                     # is selected or not in order of sample selection and not dataset index
     
     def prepare_binary(self,dataset):
         #USAGE    
@@ -94,13 +100,41 @@ class MyClassifier_25:
         
         return dataTargetDf.sample(frac = subsetfrac)
     
+    def epsilon_greedy(self,eps):
+        # Another type of sampling
+        p = np.random.randn()
+        if p < eps:
+            # Check if the data is within some region P2 and then send
+            pass
+        else:
+            # Send the data uncritically
+            pass
+
+    def region_compute(self,sample):
+        r = self.region(test_input=sample)
+        if r == 1 or r == -1:
+            # test the label data with the prediction            
+            if self.trainlabel[self.i][0] == r:
+                # if correct it will reinforce the current hyperplane
+                pass
+            else:
+                # if incorrect now make the call to keep it or not -> it will change hyperplane
+                pass
+            
+        if r != -1 or r != 1:
+            # in the p2 region take this sample -> r is the distance from the hyperplane
+            
+            return True
+
+    
     def sample_selection(self,training_sample):
         
         # This method accepts only 1 random training sample at a time and decides whether to send it or not
         
-        # ==MADE CLASS VARIABLES, REVERT IF SOMETHING BREAKS==
-        # mini_batch_slots_to_be_filled = int(self.perct_sel_smpls * self.mini_batch_size)
-        # batch_slots_to_be_filled = int(self.perct_sel_smpls * self.batch_size)
+        # ALGORITHM
+        # 
+
+        
 
         mini_start = (self.i // self.mini_batch_size)*self.mini_batch_size
         mini_end = mini_start + (self.i % self.mini_batch_size) + 1
@@ -111,11 +145,9 @@ class MyClassifier_25:
 
         # Returns True if sample is accepted and False otherwise
         # return True if accept_sample == 1 else False
-        #         
-        # EXPLORE =====================================================================
-        # Random Binary value is assigned initially
+              
         accept_sample = random.randint(0, 1)
-        # lbl, dt = self.prepare_binary(training_sample)
+        
         # # EXPLOIT =====================================================================
         # # after 50 percent completion, choose p1 and p3 over p2
         # if ((self.i/self.dataset_train.shape[0])>=0.5 and (self.i/self.dataset_train.shape[0])<0.75 and \
@@ -197,7 +229,7 @@ class MyClassifier_25:
                 if (self.i % self.batch_size) == 0 and (self.i != 0):
                     lbl, dt = self.prepare_binary(self.sampled_dataset)
                     self.train(dt,lbl)
-                
+            
             self.i+=1
         
         lbl, dt = self.prepare_binary(self.sampled_dataset)
@@ -248,7 +280,7 @@ class MyClassifier_25:
 
         # m: Number of feature vectors
         # W and w: Weight vector and Bias value respectively
-        print(traindata.shape)
+        print("STARTING TRAINING. DATA SIZE    ",traindata.shape)
         m = traindata.shape[1]
         W = cp.Variable((m,1))
         w = cp.Variable()
@@ -259,26 +291,23 @@ class MyClassifier_25:
         ## adding to class variable
         self.w = W
         self.b = w
-        
+        print("============================TRAINED==========================")
 
     def f(self,test_input):
-        test_val = test_input.dot(self.w.value) -  self.b.value
-        if test_val < -1:
-            test_val= -1
-        elif test_val > 1:
-            test_val = 1
-        else:
+        test_val =  self.region(test_input)
+        if test_val != -1 or test_val !=1:
             test_val = 0
         estimated_class = self.classes.get(test_val)
         return estimated_class
     
     def region(self,test_input):
-        if self.dist(test_input)<-1:
-            return "p1"
-        elif self.dist(test_input)>1:
-            return "p3"
+        r= self.dist(test_input)
+        if r<-1:
+            return -1
+        elif r>1:
+            return 1
         else:
-            return "p2"
+            return r
         
     def dist(self,test_input):
         return (test_input.dot(self.w.value) -  self.b.value)
@@ -309,10 +338,11 @@ class MyClassifier_25:
         correctness = []
         for percent_sampling in list_of_samples:
             self.selection_and_train(select_samples_percent=percent_sampling)
-            performance = self.test(test_dataset)
-            correctness.append(self.assess_classifier_performance(performance))
+            res,performance = self.test(test_dataset)
+            correctness.append(performance)
         return correctness
 
+    
     def plot_classifier_performance_vs_number_of_samples(self):
         pass
 
