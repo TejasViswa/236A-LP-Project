@@ -113,7 +113,8 @@ class MyClassifier_25:
     def region_compute(self,sample):
         r = self.region(test_input=sample)
         if r == 1 or r == -1:
-            # test the label data with the prediction            
+            # test the label data with the prediction     
+            # https://arxiv.org/pdf/2104.02822.pdf       
             if self.trainlabel[self.i][0] == r:
                 # if correct it will reinforce the current hyperplane
                 pass
