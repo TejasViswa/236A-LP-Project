@@ -31,7 +31,9 @@ class MyClassifier_25:
         self.mini_batch_slots_to_be_filled = int(self.perct_sel_smpls * self.mini_batch_size)
         self.batch_slots_to_be_filled = int(self.perct_sel_smpls * self.batch_size)
 
-        self.epsilon = 0.5
+        self.epsilon_out = 0.4
+        self.epsilon_sv = 0.7
+
         self.exploit_perc = 0.8 # Percentage of samples that are close to svm
         self.explore_perc = 1 - self.exploit_perc # Percentage of samples that are random
         # UNDERSTAND THAT EXPLORE AND EXPLOIT PERCENTAGES ARE PERCENTAGES FROM PERCENTAGE OF SELECTED SAMPLES
@@ -104,64 +106,89 @@ class MyClassifier_25:
         # Another type of sampling
         p = np.random.randn()
         if p < eps:
-            # Check if the data is within some region P2 and then send
-            pass
+            return 1
         else:
-            # Send the data uncritically
-            pass
+            return 0
+
+# https://arxiv.org/pdf/2104.02822.pdf   -- maybe try later
 
     def region_compute(self,sample):
-        r = self.region(test_input=sample)
-        if r == 1 or r == -1:
-            # test the label data with the prediction     
-            # https://arxiv.org/pdf/2104.02822.pdf       
+        retval = 0
+        r = self.region(test_input=sample) # distance function
+        if r == 1 or r == -1:  
+            # P3 or P1 REGION
+            # Test the label data with the prediction  
             if self.trainlabel[self.i][0] == r:
                 # if correct it will reinforce the current hyperplane
-                pass
+                # REINFORCE WITH PROBABILITY EPSILON
+                retval = self.epsilon_greedy(self.epsilon_out)
             else:
                 # if incorrect now make the call to keep it or not -> it will change hyperplane
-                pass
+                # CHANGE WITH PROBABILITY 1-EPSILON
+                retval = self.epsilon_greedy(1-self.epsilon_out)
             
         if r != -1 or r != 1:
-            # in the p2 region take this sample -> r is the distance from the hyperplane
+            # MUDDY PREDICTION --> most impact
+            # in the P2 region take this sample -> r is the distance from the hyperplane
+            retval = self.epsilon_greedy(self.epsilon_sv)
+        
+        return retval
             
-            return True
+        
+    def scheduler_sampling(self,training_sample,n=50):
+        # Accept first n samples
+        if self.sample_counter < n:
+            accept_sample = 1   
+            
+        elif self.sample_counter > n and self.sample_counter < 2*n:
+            accept_sample = self.region_compute(training_sample)
+
+        elif self.sample_counter > 2*n and self.sample_counter < 3*n:
+            accept_sample =1
+
+        elif self.sample_counter >3 *n:
+            accept_sample = self.region_compute(training_sample)
+        
+        else:
+            accept_sample = 0
+
+        return accept_sample
 
     
     def sample_selection(self,training_sample):
-        
         # This method accepts only 1 random training sample at a time and decides whether to send it or not
+        # Returns True if sample is accepted and False otherwise
+        # return True if accept_sample == 1 else False
+        
+        # INITIALIZE RANDOM SAMPLING=======================================
+        accept_sample = random.randint(0, 1)
+        
         
         # ALGORITHM
-        # 
-
+        # TYPES OF SAMPLING================================================
+        # accept_sample = self.mini_batch_sampling()
+        accept_sample = self.scheduler_sampling(training_sample)
         
-
+        if(self.i==0):
+            accept_sample = random.randint(0, 1)
+       
+        
+        # print("accept_sample: ",accept_sample)
+        # print("~~~~~~~~~~~~~~~~~~~~~~~~")
+       
+        print("Number of accepted samples  {}  current accepted {}".format(self.sample_counter,accept_sample), end="\r", flush=True)
+        # Returns True if sample is accepted and False otherwise
+        return True if accept_sample == 1 else False
+    
+    def mini_batch_sampling(self):
+        accept_sample = random.randint(0, 1)
         mini_start = (self.i // self.mini_batch_size)*self.mini_batch_size
         mini_end = mini_start + (self.i % self.mini_batch_size) + 1
 
         print("mini_start: ",mini_start,"mini_end: ", mini_end)
         print("Mini Batch: ",self.sel_arr[mini_start:mini_end])
 
-
-        # Returns True if sample is accepted and False otherwise
-        # return True if accept_sample == 1 else False
-              
-        accept_sample = random.randint(0, 1)
-        
-        # # EXPLOIT =====================================================================
-        # # after 50 percent completion, choose p1 and p3 over p2
-        # if ((self.i/self.dataset_train.shape[0])>=0.5 and (self.i/self.dataset_train.shape[0])<0.75 and \
-        #     np.count_nonzero(self.sel_arr[mini_start:mini_end]) < self.mini_batch_slots_to_be_filled*self.exploit_perc):
-        #     if(self.region(dt)=='p1' or self.region(dt)=='p3'):
-        #         accept_sample = 1
-        # # after 75 percent completion, choose p2 over p1 and p3
-        # elif ((self.i/self.dataset_train.shape[0])>=0.75 and \
-        #      np.count_nonzero(self.sel_arr[mini_start:mini_end]) < self.mini_batch_slots_to_be_filled*self.exploit_perc):
-        #     if(self.region(dt)=='p3'):
-        #         accept_sample = 1
-        
-        # MINI BATCH CREATION ===========================================================
+        # MINI BATCH  --------------------------------------------------------------
         # No. of mini batch and batch slots that must be filled to satisfy percentage criteria
         mini_batch_count = np.count_nonzero(self.sel_arr[mini_start:mini_end])
         if mini_batch_count >= self.mini_batch_slots_to_be_filled:
@@ -175,6 +202,7 @@ class MyClassifier_25:
         
         print("If Mini Batch iterator: ",self.i % self.mini_batch_size," >= rem mini slots ",self.mini_batch_size - self.mini_batch_slots_to_be_filled, "and Mini Batch Count: ",mini_batch_count," < mini slots ",self.mini_batch_slots_to_be_filled," then 1")
 
+        # BATCH ------------------------------------------------
         ### BATCH SIZE INFORMATION HAS TO COME FROM CENTRAL NODE
         start = (self.i // self.batch_size)*self.batch_size
         end = start + (self.i % self.batch_size) + 1
@@ -185,32 +213,25 @@ class MyClassifier_25:
         print("start: ",start,"end: ", end)
         print("Batch: ",self.sel_arr[start:end])
         print("If Batch Count: ",batch_count," >= slots ",self.batch_slots_to_be_filled, " then 0")
-        
-            
         # Lower bound for batch percentage criteria
         print("If Batch iterator: ",self.i % self.batch_size," >= rem slots ",self.batch_size - self.batch_slots_to_be_filled, "and Batch Count: ",batch_count," < slots ",self.batch_slots_to_be_filled, " then 1")
 
         if (self.i % self.batch_size) >= (self.batch_size - self.batch_slots_to_be_filled) and batch_count < self.batch_slots_to_be_filled:
             accept_sample = 1
-        
-        if(self.i==0):
-            accept_sample = random.randint(0, 1)
-       
-        
-        print("accept_sample: ",accept_sample)
-        print("~~~~~~~~~~~~~~~~~~~~~~~~")
 
-        # Returns True if sample is accepted and False otherwise
-        return True if accept_sample == 1 else False
+        return accept_sample
     
     def selection_and_train(self,select_samples_percent=0.5):
-        # select_samples_percent = perct_sel_smpls 
+        # OPTIONS
+        # 1. Over entire dataset via some percentage sampling
+        # 2. Until value converges then switch to rejecting more than accepting and stop taking big batches
 
         self.i = 0 # Dataset Iterator 
+        self.sample_counter = 0
         self.mini_batch_slots_to_be_filled = int(select_samples_percent * self.mini_batch_size)
         self.batch_slots_to_be_filled = int(select_samples_percent * self.batch_size)
         
-        # Iterate over dataset until it is exhausted
+        # Iterate over dataset until it is exhausted (or converged then switch state)
         while(self.i<self.sel_arr.size-1):
         
             # Sample and remove the sample from the dataset (to avoid duplicates in future sampling)
@@ -219,13 +240,13 @@ class MyClassifier_25:
             
             # Perform next steps if sample selection is true
             if self.sample_selection(sample) is True:
-                
+                self.sample_counter +=1
                 if self.sampled_dataset is None:
                     self.sampled_dataset = sample
                 else:
                     self.sampled_dataset = self.sampled_dataset.append(sample, ignore_index=True)
                
-                self.sel_arr[self.i] = 1
+                self.sel_arr[self.i] = 1 # mark as sampled
                 
                 if (self.i % self.batch_size) == 0 and (self.i != 0):
                     lbl, dt = self.prepare_binary(self.sampled_dataset)
