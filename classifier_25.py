@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import cvxpy as cp
 import random
-
+from matplotlib import pyplot as plt
 from pandas.io.pytables import performance_doc
 
 
@@ -12,6 +12,8 @@ class MyClassifier_25:
     def __init__(self,dataset,class1:int,class2:int) -> None:
         self.w = None
         self.b = None
+        self.w_hist = None
+        self.b_hist = None
         self.classes = { 1 : class1, -1: class2, 0:None}
         self.dataset_train = dataset
 
@@ -27,6 +29,7 @@ class MyClassifier_25:
         #Change these variables:
         self.perct_sel_smpls = 0.3 # percentage of Selected samples from dataset DEFAULT VALUE
         self.batch_size = 100 # Batch Size for samples
+        self.initial_sample_size = self.batch_size
         self.mini_batch_size = 20 # Mini Batch Size for samples
         self.mini_batch_slots_to_be_filled = int(self.perct_sel_smpls * self.mini_batch_size)
         self.batch_slots_to_be_filled = int(self.perct_sel_smpls * self.batch_size)
@@ -41,7 +44,7 @@ class MyClassifier_25:
         # then exploit_perc is essentially 0.8x0.3 = 0.24 of original dataset
         
         #train the classfier 
-        # self.selection_and_train()
+        self.selection_and_train()
 
     def reset_training_dataset(self):
         self.yet_to_train_dataset = self.dataset_train
@@ -135,19 +138,21 @@ class MyClassifier_25:
         return retval
             
         
-    def scheduler_sampling(self,training_sample,n=50):
+    def scheduler_sampling(self,training_sample):
+        n = self.initial_sample_size # Set it at the top
+        smpl_lbl,smpl_dt= self.prepare_binary(training_sample)
         # Accept first n samples
         if self.sample_counter < n:
             accept_sample = 1   
             
-        elif self.sample_counter > n and self.sample_counter < 2*n:
-            accept_sample = self.region_compute(training_sample)
+        elif self.sample_counter >= n and self.sample_counter < 2*n:
+            accept_sample = self.region_compute(smpl_dt)
 
-        elif self.sample_counter > 2*n and self.sample_counter < 3*n:
+        elif self.sample_counter >= 2*n and self.sample_counter < 3*n:
             accept_sample =1
 
-        elif self.sample_counter >3 *n:
-            accept_sample = self.region_compute(training_sample)
+        elif self.sample_counter >= 3*n:
+            accept_sample = self.region_compute(smpl_dt)
         
         else:
             accept_sample = 0
@@ -174,9 +179,10 @@ class MyClassifier_25:
        
         
         # print("accept_sample: ",accept_sample)
-        # print("~~~~~~~~~~~~~~~~~~~~~~~~")
-       
-        print("Number of accepted samples  {}  current accepted {}".format(self.sample_counter,accept_sample), end="\r", flush=True)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~")
+        print("# ",self.i)
+        print("Inside Sample Selection,")
+        print("Number of accepted samples: ",self.sample_counter," current accepted: ",accept_sample)
         # Returns True if sample is accepted and False otherwise
         return True if accept_sample == 1 else False
     
@@ -238,22 +244,27 @@ class MyClassifier_25:
             sample = self.yet_to_train_dataset.sample(n=1)
             self.yet_to_train_dataset.drop(sample.index)
             
+            # Train Sample if batch size is reached
+            if (self.i % self.batch_size) == 0 and (self.i != 0):
+                lbl, dt = self.prepare_binary(self.sampled_dataset)
+                self.train(dt,lbl)
+                self.store_w_b()
+            
             # Perform next steps if sample selection is true
             if self.sample_selection(sample) is True:
+                print("Sample is accepted")
                 self.sample_counter +=1
                 if self.sampled_dataset is None:
                     self.sampled_dataset = sample
                 else:
                     self.sampled_dataset = self.sampled_dataset.append(sample, ignore_index=True)
-               
+                #print("tail:",self.sampled_dataset.tail)
+                #print("shape:",self.sampled_dataset.shape)
                 self.sel_arr[self.i] = 1 # mark as sampled
-                
-                if (self.i % self.batch_size) == 0 and (self.i != 0):
-                    lbl, dt = self.prepare_binary(self.sampled_dataset)
-                    self.train(dt,lbl)
             
             self.i+=1
-        
+            if self.i>1500:
+                break
         lbl, dt = self.prepare_binary(self.sampled_dataset)
         self.train(dt,lbl)   
     
@@ -315,43 +326,75 @@ class MyClassifier_25:
         self.b = w
         print("============================TRAINED==========================")
 
-    def f(self,test_input):
-        test_val =  self.region(test_input)
-        if test_val != -1 or test_val !=1:
+    def f(self,test_input,w=None,b=None):
+        if w is None:
+            w = self.w.value
+        if b is None:
+            b = self.b.value
+        test_val =  self.region(test_input,w,b)
+        if test_val == -1 or test_val == 1:
+            test_val = test_val
+        else:
             test_val = 0
         estimated_class = self.classes.get(test_val)
         return estimated_class
     
-    def region(self,test_input):
-        r= self.dist(test_input)
-        if r<-1:
+    def region(self,test_input,w=None,b=None):
+        if w is None:
+            w = self.w.value
+        if b is None:
+            b = self.b.value
+        r = self.dist(test_input,w,b)
+        if r < -1:
             return -1
-        elif r>1:
+        elif r > 1:
             return 1
         else:
             return r
         
-    def dist(self,test_input):
-        return (test_input.dot(self.w.value) -  self.b.value)
+    def dist(self,test_input,w=None,b=None):
+        if w is None:
+            w = self.w.value
+        if b is None:
+            b = self.b.value
+        dist_val = test_input.dot(w) -  b
+        return dist_val.item()
+    
+    def store_w_b(self):
+        # Store the w and b values each time, classifier is trained
+        if self.w_hist is None:
+            self.w_hist = self.w.value
+            self.b_hist = np.reshape(np.array([self.b.value]),[-1,1])
+
+        else:
+            self.w_hist = np.hstack((self.w_hist,self.w.value))
+            self.b_hist = np.hstack((self.b_hist,np.reshape(np.array([self.b.value]),[-1,1])))
+
+        return None
     
     def assess_classifier_performance(self,performance):
         performance = np.asarray(performance)
         correct = (np.count_nonzero(performance)/len(performance))*100
         return correct
 
-    def test(self,dataset_test):
+    def test(self,dataset_test,w=None,b=None):
+        if w is None:
+            w = self.w.value
+        if b is None:
+            b = self.b.value
         testlabel,testdata= self.prepare_binary(dataset_test)
         res = []
         performance = 0
         for i in range(testdata.shape[0]):
-            result = self.f(testdata[i])
+            result = self.f(testdata[i],w,b)
             res.append(result)
             
             actual_class = self.classes.get(int(testlabel[i]))
             ## assessing performance
             if result == actual_class:
                 performance += 1
-         
+                print("cont perf",performance) 
+        print(performance) 
         performance /= testlabel.shape[0]
         return res, performance
     
@@ -365,12 +408,19 @@ class MyClassifier_25:
         return correctness
 
     
-    def plot_classifier_performance_vs_number_of_samples(self):
-        pass
-
-    
+    def plot_classifier_performance_vs_number_of_samples(self, dataset_test):
         
-
-
+        r_hist = None
+        p_hist = None
         
-
+        for it in range(0,self.w_hist.shape[1]):
+            res, performance = self.test(dataset_test,np.reshape(my_clf.w_hist[:,it],[-1,1]),np.reshape(my_clf.b_hist[:,it],[-1,1]))
+            if r_hist is None and p_hist is None:
+                r_hist,p_hist = res,performance
+            else:
+                r_hist = np.append(r_hist,res)
+                p_hist = np.append(p_hist,performance)
+        y = p_hist.tolist()
+        x = range(0,self.batch_size*(self.i//self.batch_size),self.batch_size)
+        plt.plot(x,y)
+        return x,y
