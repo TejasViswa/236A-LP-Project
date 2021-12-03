@@ -392,9 +392,7 @@ class MyClassifier_25:
             actual_class = self.classes.get(int(testlabel[i]))
             ## assessing performance
             if result == actual_class:
-                performance += 1
-                print("cont perf",performance) 
-        print(performance) 
+                performance += 1 
         performance /= testlabel.shape[0]
         return res, performance
     
@@ -424,3 +422,5 @@ class MyClassifier_25:
         x = range(0,self.batch_size*(self.i//self.batch_size),self.batch_size)
         plt.plot(x,y)
         return x,y
+
+    
