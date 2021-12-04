@@ -117,11 +117,16 @@ class MyClassifier_25:
 
     def region_compute(self,sample):
         retval = 0
-        r = self.region(test_input=sample) # distance function
+        smpl_lbl,smpl_dt= self.prepare_binary(sample)
+        r = self.region(test_input=smpl_dt) # distance function
         if r == 1 or r == -1:  
             # P3 or P1 REGION
-            # Test the label data with the prediction  
-            if self.trainlabel[self.i][0] == r:
+            # Test the label data with the prediction
+            for key, val in self.classes.items():
+                if val == sample['label'].values[0]:
+                    cls = key
+            print("cls: ",cls)
+            if cls == r:
                 # if correct it will reinforce the current hyperplane
                 # REINFORCE WITH PROBABILITY EPSILON
                 retval = self.epsilon_greedy(self.epsilon_out)
@@ -140,19 +145,19 @@ class MyClassifier_25:
         
     def scheduler_sampling(self,training_sample):
         n = self.initial_sample_size # Set it at the top
-        smpl_lbl,smpl_dt= self.prepare_binary(training_sample)
+        
         # Accept first n samples
         if self.sample_counter < n:
             accept_sample = 1   
             
         elif self.sample_counter >= n and self.sample_counter < 2*n:
-            accept_sample = self.region_compute(smpl_dt)
+            accept_sample = self.region_compute(training_sample)
 
         elif self.sample_counter >= 2*n and self.sample_counter < 3*n:
             accept_sample =1
 
         elif self.sample_counter >= 3*n:
-            accept_sample = self.region_compute(smpl_dt)
+            accept_sample = self.region_compute(training_sample)
         
         else:
             accept_sample = 0
@@ -419,8 +424,6 @@ class MyClassifier_25:
                 r_hist = np.append(r_hist,res)
                 p_hist = np.append(p_hist,performance)
         y = p_hist.tolist()
-        x = range(0,self.batch_size*(self.i//self.batch_size),self.batch_size)
+        x = range(self.batch_size,self.batch_size*(self.i//self.batch_size+1),self.batch_size)
         plt.plot(x,y)
         return x,y
-
-    
