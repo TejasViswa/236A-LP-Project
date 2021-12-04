@@ -41,6 +41,7 @@ class MyClassifier_25:
         self.aglo_sel = algo #Set to 2 by default
         
         # Percentage Random Batch Sampling Variables:
+        # This algo will collect (iter_end * perct_sel_smpls) no. of samples
         self.perct_sel_smpls = 0.3 # percentage of Selected samples from dataset DEFAULT VALUE
         self.batch_size = 100 # Batch Size for samples
         self.mini_batch_size = 20 # Mini Batch Size for samples
@@ -48,9 +49,11 @@ class MyClassifier_25:
         self.batch_slots_to_be_filled = int(self.perct_sel_smpls * self.batch_size)
         
         # Epsilon Greedy Sampling Variables:
+        # This algo will collect (sampling_requirement + 1) no. of samples
         self.initial_sample_size = self.batch_size
         self.epsilon_out = 0.4
         self.epsilon_sv = 0.7
+        self.sampling_requirement = 1000
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Classifier Function
@@ -194,7 +197,13 @@ class MyClassifier_25:
         
         else:
             accept_sample = 0
-
+        
+        # Restriction of number of samples:
+        if self.sample_counter > self.sampling_requirement:
+            accept_sample = 0
+        elif self.iter_end - self.i < self.sampling_requirement - self.sample_counter:
+            accept_sample = 1
+            
         return accept_sample
     
     def region_compute(self,sample):
