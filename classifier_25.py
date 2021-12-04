@@ -72,12 +72,6 @@ class MyClassifier_25:
             sample = self.yet_to_train_dataset.sample(n=1)
             self.yet_to_train_dataset.drop(sample.index)
             
-            # Train Sample if batch size is reached
-            if (self.i % self.batch_size) == 0 and (self.i != 0):
-                lbl, dt = self.prepare_binary(self.sampled_dataset)
-                self.train(dt,lbl)
-                self.store_w_b()
-            
             # Perform next steps if sample selection is true
             if self.sample_selection(sample) is True:
                 print("Sample is accepted")
@@ -89,6 +83,12 @@ class MyClassifier_25:
                 #print("tail:",self.sampled_dataset.tail)
                 #print("shape:",self.sampled_dataset.shape)
                 self.sel_arr[self.i] = 1 # mark as sampled
+                
+                # Train Sample if batch size is reached
+                if (self.sample_counter % self.batch_size) == 0 and (self.sample_counter != 0):
+                    lbl, dt = self.prepare_binary(self.sampled_dataset)
+                    self.train(dt,lbl)
+                    self.store_w_b()
             
             self.i+=1
             if self.i>self.iter_end:
@@ -373,7 +373,7 @@ class MyClassifier_25:
                 r_hist = np.append(r_hist,res)
                 p_hist = np.append(p_hist,performance)
         y = p_hist.tolist()
-        x = range(self.batch_size,self.batch_size*(self.i//self.batch_size+1),self.batch_size)
+        x = range(self.batch_size,self.batch_size*(self.sample_counter//self.batch_size+1),self.batch_size)
         plt.plot(x,y)
         
         return x,y
