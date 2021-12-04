@@ -8,7 +8,7 @@ from pandas.io.pytables import performance_doc
 
 class MyClassifier_25:  
 
-    def __init__(self,dataset,class1:int,class2:int) -> None:
+    def __init__(self,dataset,class1:int,class2:int,algo=2) -> None:
     
     # ~~~~~~~~~~~~~~~~~~ VARIABLES THAT SHOULD NOT BE CHANGED ~~~~~~~~~~~~~~~~~~~~~~
         self.w = None
@@ -32,10 +32,13 @@ class MyClassifier_25:
         # End Iteration
         self.iter_end = 1500 # Set it very high if you want to execute over entire dataset
         
+        # Debug Mode - Executes print statements if true
+        self.debug_mode = False
+        
         # Algorithms:
         # 1.Percentage Random Batch Sampling
         # 2.Epsilon Greedy Sampling
-        self.aglo_sel = 2
+        self.aglo_sel = algo #Set to 2 by default
         
         # Percentage Random Batch Sampling Variables:
         self.perct_sel_smpls = 0.3 # percentage of Selected samples from dataset DEFAULT VALUE
@@ -74,7 +77,7 @@ class MyClassifier_25:
             
             # Perform next steps if sample selection is true
             if self.sample_selection(sample) is True:
-                print("Sample is accepted")
+                print("Sample is accepted") if self.debug_mode is True else None
                 self.sample_counter +=1
                 if self.sampled_dataset is None:
                     self.sampled_dataset = sample
@@ -118,10 +121,10 @@ class MyClassifier_25:
             accept_sample = random.randint(0, 1)
         
         # print("accept_sample: ",accept_sample)
-        print("~~~~~~~~~~~~~~~~~~~~~~~~")
-        print("# ",self.i)
-        print("Inside Sample Selection,")
-        print("Number of accepted samples: ",self.sample_counter," current accepted: ",accept_sample)
+        print("~~~~~~~~~~~~~~~~~~~~~~~~") if self.debug_mode is True else None
+        print("# ",self.i) if self.debug_mode is True else None
+        print("Inside Sample Selection,") if self.debug_mode is True else None
+        print("Number of accepted samples: ",self.sample_counter," current accepted: ",accept_sample) if self.debug_mode is True else None
         # Returns True if sample is accepted and False otherwise
         return True if accept_sample == 1 else False
 
@@ -133,8 +136,8 @@ class MyClassifier_25:
         mini_start = (self.i // self.mini_batch_size)*self.mini_batch_size
         mini_end = mini_start + (self.i % self.mini_batch_size) + 1
 
-        print("mini_start: ",mini_start,"mini_end: ", mini_end)
-        print("Mini Batch: ",self.sel_arr[mini_start:mini_end])
+        print("mini_start: ",mini_start,"mini_end: ", mini_end) if self.debug_mode is True else None
+        print("Mini Batch: ",self.sel_arr[mini_start:mini_end]) if self.debug_mode is True else None
 
         # MINI BATCH  --------------------------------------------------------------
         # No. of mini batch and batch slots that must be filled to satisfy percentage criteria
@@ -142,13 +145,13 @@ class MyClassifier_25:
         if mini_batch_count >= self.mini_batch_slots_to_be_filled:
             accept_sample = 0
         
-        print("If Mini Batch Count: ",mini_batch_count," >= mini slots ",self.mini_batch_slots_to_be_filled," then 0")
+        print("If Mini Batch Count: ",mini_batch_count," >= mini slots ",self.mini_batch_slots_to_be_filled," then 0") if self.debug_mode is True else None
             
         # Lower bound for mini batch percentage criteria
         if (self.i % self.mini_batch_size) >= (self.mini_batch_size - self.mini_batch_slots_to_be_filled) and mini_batch_count <self.mini_batch_slots_to_be_filled:
             accept_sample = 1
         
-        print("If Mini Batch iterator: ",self.i % self.mini_batch_size," >= rem mini slots ",self.mini_batch_size - self.mini_batch_slots_to_be_filled, "and Mini Batch Count: ",mini_batch_count," < mini slots ",self.mini_batch_slots_to_be_filled," then 1")
+        print("If Mini Batch iterator: ",self.i % self.mini_batch_size," >= rem mini slots ",self.mini_batch_size - self.mini_batch_slots_to_be_filled, "and Mini Batch Count: ",mini_batch_count," < mini slots ",self.mini_batch_slots_to_be_filled," then 1") if self.debug_mode is True else None
 
         # BATCH ------------------------------------------------
         ### BATCH SIZE INFORMATION HAS TO COME FROM CENTRAL NODE
@@ -158,11 +161,11 @@ class MyClassifier_25:
         if batch_count >= self.batch_slots_to_be_filled:
             accept_sample = 0
         
-        print("start: ",start,"end: ", end)
-        print("Batch: ",self.sel_arr[start:end])
-        print("If Batch Count: ",batch_count," >= slots ",self.batch_slots_to_be_filled, " then 0")
+        print("start: ",start,"end: ", end) if self.debug_mode is True else None
+        print("Batch: ",self.sel_arr[start:end]) if self.debug_mode is True else None
+        print("If Batch Count: ",batch_count," >= slots ",self.batch_slots_to_be_filled, " then 0") if self.debug_mode is True else None
         # Lower bound for batch percentage criteria
-        print("If Batch iterator: ",self.i % self.batch_size," >= rem slots ",self.batch_size - self.batch_slots_to_be_filled, "and Batch Count: ",batch_count," < slots ",self.batch_slots_to_be_filled, " then 1")
+        print("If Batch iterator: ",self.i % self.batch_size," >= rem slots ",self.batch_size - self.batch_slots_to_be_filled, "and Batch Count: ",batch_count," < slots ",self.batch_slots_to_be_filled, " then 1") if self.debug_mode is True else None
 
         if (self.i % self.batch_size) >= (self.batch_size - self.batch_slots_to_be_filled) and batch_count < self.batch_slots_to_be_filled:
             accept_sample = 1
@@ -204,7 +207,7 @@ class MyClassifier_25:
             for key, val in self.classes.items():
                 if val == sample['label'].values[0]:
                     cls = key
-            print("cls: ",cls)
+            print("cls: ",cls) if self.debug_mode is True else None
             if cls == r:
                 # if correct it will reinforce the current hyperplane
                 # REINFORCE WITH PROBABILITY EPSILON
@@ -238,7 +241,7 @@ class MyClassifier_25:
 
         # m: Number of feature vectors
         # W and w: Weight vector and Bias value respectively
-        print("STARTING TRAINING. DATA SIZE    ",traindata.shape)
+        print("STARTING TRAINING. DATA SIZE    ",traindata.shape) if self.debug_mode is True else None
         m = traindata.shape[1]
         W = cp.Variable((m,1))
         w = cp.Variable()
@@ -249,7 +252,7 @@ class MyClassifier_25:
         ## adding to class variable
         self.w = W
         self.b = w
-        print("============================TRAINED==========================")
+        print("============================TRAINED==========================") if self.debug_mode is True else None
     
     def _hinge_loss_svm(self,traindata, trainlabel,W,w):
         m =traindata.shape[1]
@@ -360,7 +363,7 @@ class MyClassifier_25:
         return res, performance
 
     
-    def plot_classifier_performance_vs_number_of_samples(self, dataset_test):
+    def plot_classifier_performance_vs_number_of_samples(self, dataset_test, to_plot = True):
         
         r_hist = None
         p_hist = None
@@ -374,7 +377,8 @@ class MyClassifier_25:
                 p_hist = np.append(p_hist,performance)
         y = p_hist.tolist()
         x = range(self.batch_size,self.batch_size*(self.sample_counter//self.batch_size+1),self.batch_size)
-        plt.plot(x,y)
+        if to_plot == True:
+            plt.plot(x,y)
         
         return x,y
 
