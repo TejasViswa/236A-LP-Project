@@ -295,6 +295,7 @@ class MyClassifier_25:
         # please pass the right arguments to the following function as follows:
         # trainlabel, traindata, dataTargetDf = prepare_binary(a,b)
 
+        # ASSUMING the central node can send this function/associated data to the peripheral node
 
         # We now assign +1 to one class and -1 to the other;
         # Therefore +1 and -1 will be the new labels
@@ -378,7 +379,7 @@ class MyClassifier_25:
         p_hist = None
         
         for it in range(0,self.w_hist.shape[1]):
-            res, performance = self.test(dataset_test,np.reshape(my_clf.w_hist[:,it],[-1,1]),np.reshape(my_clf.b_hist[:,it],[-1,1]))
+            res, performance = self.test(dataset_test,np.reshape(self.w_hist[:,it],[-1,1]),np.reshape(self.b_hist[:,it],[-1,1]))
             if r_hist is None and p_hist is None:
                 r_hist,p_hist = res,performance
             else:
