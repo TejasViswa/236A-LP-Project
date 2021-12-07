@@ -29,31 +29,42 @@ class MyClassifier_25:
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~ VARIABLES YOU CAN CHANGE ~~~~~~~~~~~~~~~~~~~~~~~~~~~
         
-        # End Iteration
-        self.iter_end = 1500 # Set it very high if you want to execute over entire dataset
-        
         # Debug Mode - Executes print statements if true
         self.debug_mode = False
         
         # Algorithms:
         # 1.Percentage Random Batch Sampling
         # 2.Epsilon Greedy Sampling
-        self.aglo_sel = algo #Set to 2 by default
+        # 3.Error Sampling
+        self.algo_sel = algo #Set to 2 by default
+        
+        # End Iteration
+        if self.algo_sel == 1 or self.algo_sel == 2:
+            self.iter_end = 100 # Set it very high if you want to execute over entire dataset
+        elif self.algo_sel == 3:
+            self.iter_end = 1500
         
         # Percentage Random Batch Sampling Variables:
         # This algo will collect (iter_end * perct_sel_smpls) no. of samples
-        self.perct_sel_smpls = 0.3 # percentage of Selected samples from dataset DEFAULT VALUE
-        self.batch_size = 100 # Batch Size for samples
-        self.mini_batch_size = 20 # Mini Batch Size for samples
+        self.perct_sel_smpls = 0.4 # percentage of Selected samples from dataset DEFAULT VALUE
+        self.batch_size = 2 # Batch Size for samples
+        self.mini_batch_size = 2 # Mini Batch Size for samples
         self.mini_batch_slots_to_be_filled = int(self.perct_sel_smpls * self.mini_batch_size)
         self.batch_slots_to_be_filled = int(self.perct_sel_smpls * self.batch_size)
         
         # Epsilon Greedy Sampling Variables:
         # This algo will collect (sampling_requirement + 1) no. of samples
-        self.initial_sample_size = self.batch_size
+        self.initial_sample_size = 2
         self.epsilon_out = 0.4
         self.epsilon_sv = 0.7
-        self.sampling_requirement = 1000
+        self.sampling_requirement = 50
+        
+        # Error Sampling Variables:
+        # his algo will collect (sampling_requirement + 1) no. of samples
+        self.initial_e_sample_size = 2
+        self.err_val_chck_till = 10
+        self.e_sampling_requirement = 1000
+        self.e_update = 1
     
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Classifier Function
@@ -91,10 +102,17 @@ class MyClassifier_25:
                 self.sel_arr[self.i] = 1 # mark as sampled
                 
                 # Train Sample if batch size is reached
-                if (self.sample_counter % self.batch_size) == 0 and (self.sample_counter != 0):
-                    lbl, dt = self.prepare_binary(self.sampled_dataset)
-                    self.train(dt,lbl)
-                    self.store_w_b()
+                if self.algo_sel == 1 or self.algo_sel == 2:
+                    if (self.sample_counter % self.batch_size) == 0 and (self.sample_counter != 0) and (self.sampled_dataset is not None):
+                        lbl, dt = self.prepare_binary(self.sampled_dataset)
+                        self.train(dt,lbl)
+                        self.store_w_b()
+                # Train sample if update size is reached
+                elif self.algo_sel == 3:
+                    if (self.sample_counter % self.e_update) == 0 and (self.sample_counter != 0) and (self.sampled_dataset is not None):
+                        lbl, dt = self.prepare_binary(self.sampled_dataset)
+                        self.train(dt,lbl)
+                        self.store_w_b()
             
             self.i+=1
             if self.i>self.iter_end:
@@ -113,10 +131,12 @@ class MyClassifier_25:
         
         # ALGORITHM
         # TYPES OF SAMPLING================================================
-        if self.aglo_sel == 1:
+        if self.algo_sel == 1:
             accept_sample = self.mini_batch_sampling()
-        elif self.aglo_sel == 2:
+        elif self.algo_sel == 2:
             accept_sample = self.scheduler_sampling(training_sample)
+        elif self.algo_sel == 3:
+            accept_sample = self.error_sampling(training_sample)
         else:
             accept_sample = random.randint(0, 1)
         
@@ -240,6 +260,61 @@ class MyClassifier_25:
             return 1
         else:
             return 0
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 3.Error Sampling ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# https://arxiv.org/pdf/2104.02822.pdf   -- maybe try later
+    
+#     100 --> Train
+#     Check if correct
+#         if correct ignore
+#         if wrong wait till n no. of wrong samples then update classifier
+#     Repeat
+    
+    def error_sampling(self,training_sample):
+        n = self.initial_e_sample_size # Set it at the top
+        
+        # Accept first n samples
+        if self.sample_counter < n:
+            print("E-sampling: sample counter<n so accept_sample=1") if self.debug_mode is True else None
+            accept_sample = 1
+            
+        elif self.sample_counter >= n:
+            print("E-sampling: sample counter>=n so accept_sample=region_e_compute") if self.debug_mode is True else None
+            accept_sample = self.region_e_compute(training_sample)
+        
+        # Restriction of number of samples:
+#         if self.sample_counter > self.sampling_requirement:
+#             accept_sample = 0
+#         elif self.iter_end - self.i < self.sampling_requirement - self.sample_counter:
+#             accept_sample = 1
+            
+        return accept_sample
+    
+    def region_e_compute(self,sample):
+        retval = 0
+        smpl_lbl,smpl_dt= self.prepare_binary(sample)
+        # Predict class of given sample:
+        pred_cls = self.f(smpl_dt)
+        print("Pred_cls ? sample_cls : ",pred_cls," ? ",sample['label'].values[0]) if self.debug_mode is True else None
+        # Discard sample if predicted correctly
+        if pred_cls == sample['label'].values[0]:
+            print("Correct Prediction") if self.debug_mode is True else None
+            retval = 0
+        # Accept sample only if prediction is wrong
+        else:
+            print("Wrong Prediction") if self.debug_mode is True else None
+            retval = 1
+        
+        return retval
+    
+#     def error_rate(self,eps):
+#         # Another type of sampling
+#         p = np.random.randn()
+#         if p < eps:
+#             return 1
+#         else:
+#             return 0
         
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ TRAIN FUNCTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -295,7 +370,6 @@ class MyClassifier_25:
         # please pass the right arguments to the following function as follows:
         # trainlabel, traindata, dataTargetDf = prepare_binary(a,b)
 
-        # ASSUMING the central node can send this function/associated data to the peripheral node
 
         # We now assign +1 to one class and -1 to the other;
         # Therefore +1 and -1 will be the new labels
@@ -379,14 +453,23 @@ class MyClassifier_25:
         p_hist = None
         
         for it in range(0,self.w_hist.shape[1]):
-            res, performance = self.test(dataset_test,np.reshape(self.w_hist[:,it],[-1,1]),np.reshape(self.b_hist[:,it],[-1,1]))
+            res, performance = self.test(dataset_test,np.reshape(my_clf.w_hist[:,it],[-1,1]),np.reshape(my_clf.b_hist[:,it],[-1,1]))
             if r_hist is None and p_hist is None:
                 r_hist,p_hist = res,performance
             else:
                 r_hist = np.append(r_hist,res)
                 p_hist = np.append(p_hist,performance)
-        y = p_hist.tolist()
-        x = range(self.batch_size,self.batch_size*(self.sample_counter//self.batch_size+1),self.batch_size)
+        if isinstance(p_hist, float):
+            y = p_hist
+        else:
+            y = p_hist.tolist()
+        print("performance:",y) if self.debug_mode is True else None
+        
+        if self.algo_sel == 1 or self.algo_sel == 2:
+            x = range(self.batch_size,self.batch_size*(self.sample_counter//self.batch_size+1),self.batch_size)
+        elif self.algo_sel == 3:
+            x = range(self.e_update,self.e_update*(self.sample_counter//self.e_update+1),self.e_update)
+        print("x",x) if self.debug_mode is True else None
         if to_plot == True:
             plt.plot(x,y)
         
@@ -397,9 +480,11 @@ class MyClassifier_25:
             w = self.w.value
         if b is None:
             b = self.b.value
-        test_val =  self.region(test_input,w,b)
-        if test_val == -1 or test_val == 1:
-            test_val = test_val
+        test_val =  self.dist(test_input,w,b)
+        if test_val >= 0:
+            test_val = 1
+        elif test_val < 0:
+            test_val = -1
         else:
             test_val = 0
         estimated_class = self.classes.get(test_val)
