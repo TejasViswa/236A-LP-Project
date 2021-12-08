@@ -51,7 +51,9 @@ class MyClassifier_25:
         # Epsilon Greedy Sampling Variables:
         # This algo will collect (sampling_requirement + 1) no. of samples
         self.initial_sample_size = self.batch_size
-        self.epsilon_out = 0.4
+        
+        self.epsilon  = 0.5
+        self.epsilon_out = 0.3
         self.epsilon_sv = 0.7
         self.sampling_requirement = 1000
     
@@ -177,7 +179,7 @@ class MyClassifier_25:
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2.Epsilon Greedy Sampling ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-# https://arxiv.org/pdf/2104.02822.pdf   -- maybe try later
+  # https://arxiv.org/pdf/2104.02822.pdf   -- maybe try later
 
     def scheduler_sampling(self,training_sample):
         n = self.initial_sample_size # Set it at the top
@@ -404,6 +406,8 @@ class MyClassifier_25:
             test_val = 0
         estimated_class = self.classes.get(test_val)
         return estimated_class
+
+   
     
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UNUSED FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
