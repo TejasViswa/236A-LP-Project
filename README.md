@@ -53,7 +53,8 @@ https://www.overleaf.com/read/nphhyqkkyyps
 - To execute part 2, run the file - `python main_part2.py`
 
 ## Adding the MNIST dataset to the problem
-Add the mnist data like ![so](imgs/dir_struct.jpeg) 
+Add the mnist data like so  
+![so](imgs/dir_struct.jpeg) 
 
 
 ### 
