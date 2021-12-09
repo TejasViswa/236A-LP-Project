@@ -8,7 +8,7 @@ from pandas.io.pytables import performance_doc
 
 class MyClassifier_25:  
 
-    def __init__(self,dataset,class1:int,class2:int,algo=2) -> None:
+    def __init__(self,dataset,class1:int,class2:int,algo=2,epsilon_out =0.3,epsilon_sv=0.7) -> None:
     
     # ~~~~~~~~~~~~~~~~~~ VARIABLES THAT SHOULD NOT BE CHANGED ~~~~~~~~~~~~~~~~~~~~~~
         self.w = None
@@ -57,8 +57,8 @@ class MyClassifier_25:
         self.initial_sample_size = self.batch_size
         
         self.epsilon  = 0.5
-        self.epsilon_out = 0.3
-        self.epsilon_sv = 0.7
+        self.epsilon_out =epsilon_out
+        self.epsilon_sv = epsilon_sv
         self.sampling_requirement = 50
         
         # Error Sampling Variables:
@@ -239,11 +239,12 @@ class MyClassifier_25:
                 if val == sample['label'].values[0]:
                     cls = key
             print("cls: ",cls) if self.debug_mode is True else None
-            if cls == r:
-                # if correct it will reinforce the current hyperplane
-                # REINFORCE WITH PROBABILITY EPSILON
-                retval = self.epsilon_greedy(self.epsilon_out)
-            else:
+            # if cls == r:
+            #     # if correct it will reinforce the current hyperplane
+            #     # REINFORCE WITH PROBABILITY EPSILON
+            #     retval = self.epsilon_greedy(self.epsilon_out)
+            # else:
+            if cls != r:
                 # if incorrect now make the call to keep it or not -> it will change hyperplane
                 # CHANGE WITH PROBABILITY 1-EPSILON
                 retval = self.epsilon_greedy(1-self.epsilon_out)
@@ -251,7 +252,7 @@ class MyClassifier_25:
         if r != -1 or r != 1:
             # MUDDY PREDICTION --> most impact
             # in the P2 region take this sample -> r is the distance from the hyperplane
-            retval = self.epsilon_greedy(self.epsilon_sv)
+            retval = self.epsilon_greedy(self.epsilon_out)
         
         return retval
     
@@ -447,6 +448,9 @@ class MyClassifier_25:
                 performance += 1 
         performance /= testlabel.shape[0]
         return res, performance
+    
+    def plot_eplison_greedy_classifier_performance_vs_samples(self):
+        pass
 
     
     def plot_classifier_performance_vs_number_of_samples(self, dataset_test, to_plot = True):
@@ -455,7 +459,7 @@ class MyClassifier_25:
         p_hist = None
         
         for it in range(0,self.w_hist.shape[1]):
-            res, performance = self.test(dataset_test,np.reshape(my_clf.w_hist[:,it],[-1,1]),np.reshape(my_clf.b_hist[:,it],[-1,1]))
+            res, performance = self.test(dataset_test,np.reshape(self.w_hist[:,it],[-1,1]),np.reshape(self.b_hist[:,it],[-1,1]))
             if r_hist is None and p_hist is None:
                 r_hist,p_hist = res,performance
             else:
