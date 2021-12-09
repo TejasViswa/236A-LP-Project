@@ -4,11 +4,11 @@ import cvxpy as cp
 import random
 from matplotlib import pyplot as plt
 from pandas.io.pytables import performance_doc
-
+np.random.seed(19680801)
 
 class MyClassifier_25:  
 
-    def __init__(self,dataset,class1:int,class2:int,algo=2,epsilon_out =0.3,epsilon_sv=0.7) -> None:
+    def __init__(self,dataset,class1:int,class2:int,algo=2) -> None:
     
     # ~~~~~~~~~~~~~~~~~~ VARIABLES THAT SHOULD NOT BE CHANGED ~~~~~~~~~~~~~~~~~~~~~~
         self.w = None
@@ -40,9 +40,9 @@ class MyClassifier_25:
         
         # End Iteration
         if self.algo_sel == 1 or self.algo_sel == 2:
-            self.iter_end = 100 # Set it very high if you want to execute over entire dataset
+            self.iter_end = 500 # Set it very high if you want to execute over entire dataset
         elif self.algo_sel == 3:
-            self.iter_end = 1500
+            self.iter_end = 10000
         
         # Percentage Random Batch Sampling Variables:
         # This algo will collect (iter_end * perct_sel_smpls) no. of samples
@@ -54,20 +54,17 @@ class MyClassifier_25:
         
         # Epsilon Greedy Sampling Variables:
         # This algo will collect (sampling_requirement + 1) no. of samples
-        self.initial_sample_size = self.batch_size
-        
-        self.epsilon  = 0.5
-        self.epsilon_out =epsilon_out
-        self.epsilon_sv = epsilon_sv
+        self.initial_sample_size = 2
+        self.epsilon_out = 0.4
+        self.epsilon_sv = 0.7
         self.sampling_requirement = 50
         
         # Error Sampling Variables:
         # his algo will collect (sampling_requirement + 1) no. of samples
-        self.initial_e_sample_size = 2
+        self.initial_e_sample_size = 75
         self.err_val_chck_till = 10
         self.e_sampling_requirement = 1000
-        self.e_update = 1
-    
+        self.e_update = 2   
     # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ FUNCTION ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
         # Classifier Function
         self.selection_and_train()
@@ -199,7 +196,7 @@ class MyClassifier_25:
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2.Epsilon Greedy Sampling ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-  # https://arxiv.org/pdf/2104.02822.pdf   -- maybe try later
+# https://arxiv.org/pdf/2104.02822.pdf   -- maybe try later
 
     def scheduler_sampling(self,training_sample):
         n = self.initial_sample_size # Set it at the top
@@ -239,12 +236,11 @@ class MyClassifier_25:
                 if val == sample['label'].values[0]:
                     cls = key
             print("cls: ",cls) if self.debug_mode is True else None
-            # if cls == r:
-            #     # if correct it will reinforce the current hyperplane
-            #     # REINFORCE WITH PROBABILITY EPSILON
-            #     retval = self.epsilon_greedy(self.epsilon_out)
-            # else:
-            if cls != r:
+            if cls == r:
+                # if correct it will reinforce the current hyperplane
+                # REINFORCE WITH PROBABILITY EPSILON
+                retval = self.epsilon_greedy(self.epsilon_out)
+            else:
                 # if incorrect now make the call to keep it or not -> it will change hyperplane
                 # CHANGE WITH PROBABILITY 1-EPSILON
                 retval = self.epsilon_greedy(1-self.epsilon_out)
@@ -252,7 +248,7 @@ class MyClassifier_25:
         if r != -1 or r != 1:
             # MUDDY PREDICTION --> most impact
             # in the P2 region take this sample -> r is the distance from the hyperplane
-            retval = self.epsilon_greedy(self.epsilon_out)
+            retval = self.epsilon_greedy(self.epsilon_sv)
         
         return retval
     
@@ -303,10 +299,11 @@ class MyClassifier_25:
         # Discard sample if predicted correctly
         if pred_cls == sample['label'].values[0]:
             print("Correct Prediction") if self.debug_mode is True else None
-            retval = 0
+            retval = 0 #self.epsilon_greedy(self.epsilon_sv)
         # Accept sample only if prediction is wrong
         else:
             print("Wrong Prediction") if self.debug_mode is True else None
+            #some_digit_show = plt.imshow(sample.drop(labels = ["label"],axis = 1).to_numpy().reshape(28,28), cmap=mpl.cm.binary) #if self.debug_mode is True else None
             retval = 1
         
         return retval
@@ -448,9 +445,6 @@ class MyClassifier_25:
                 performance += 1 
         performance /= testlabel.shape[0]
         return res, performance
-    
-    def plot_eplison_greedy_classifier_performance_vs_samples(self):
-        pass
 
     
     def plot_classifier_performance_vs_number_of_samples(self, dataset_test, to_plot = True):
@@ -495,8 +489,6 @@ class MyClassifier_25:
             test_val = 0
         estimated_class = self.classes.get(test_val)
         return estimated_class
-
-   
     
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~    
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ UNUSED FUNCTIONS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -556,4 +548,59 @@ class MyClassifier_25:
         correct = (np.count_nonzero(performance)/len(performance))*100
         
         return correct
+    
+    def dis_sim_ngbr(self,dataset,no_of_ngbr=5,no_of_dissim=1): # Discard points with similar neighbours
+        dissim_dataset = dataset
+        for i in dissim_dataset.index:
+            Xi = dissim_dataset[i].drop(labels = ["label"],axis = 1)
+            Xi = Xi.to_numpy()
+            dist_arr = {}
+            for j in dissim_dataset.index:
+                Xj = dissim_dataset[j].drop(labels = ["label"],axis = 1)
+                Xj = Xj.to_numpy()
+                sum_sq = np.sum(np.square(Xi - Xj))
+                dist = np.sqrt(sum_sq)
+                dist_arr[j]=dist
+            dist_arr = sorted(dist_arr.items(), key=lambda x:x[1])
+            to_remove = dist_arr.keys()[no_of_ngbr:]
+            for key in to_remove:
+                del dist_arr[key]
+            
+            dissim = 0
+            for it in dist_arr:
+                if dissim_dataset[it[0]]['label'].values[0] != dissim_dataset[it[0]]['label'].values[0]:
+                    dissim += 1
+            
+            if dissim < no_of_dissim:
+                dissim_dataset.drop(dissim_dataset.index[i])
+    def plot_w_b_change(self):
+        w_change = None
+        for it in range(0,self.w_hist.shape[1]):
+            if it-1 == -1:
+                sum_sq = 0
+            else:
+                sum_sq = np.sum(np.square(self.w_hist[:,it-1] - self.w_hist[:,it])+np.square(self.b_hist[:,it-1] - self.b_hist[:,it]))
+            dist = np.sqrt(sum_sq)
+            print("type dist",type(dist))
+            print("dist",dist)
+            if w_change is None:
+                w_change = dist
+            else:
+                w_change = np.append(w_change,dist)
+            print("w_change",w_change)
+        if isinstance(w_change, float):
+            y = w_change
+        else:
+            y = w_change.tolist()
+        print("performance:",y) if self.debug_mode is True else None
+        
+        if self.algo_sel == 1 or self.algo_sel == 2:
+            x = range(self.batch_size,self.batch_size*(self.sample_counter//self.batch_size+1),self.batch_size)
+        elif self.algo_sel == 3:
+            x = range(self.e_update,self.e_update*(self.sample_counter//self.e_update+1),self.e_update)
+        print("x",x) if self.debug_mode is True else None
+        plt.plot(x,y)
+        
+        return x,y
+    
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ END OF CLASS ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
