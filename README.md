@@ -57,23 +57,4 @@
 - [Reduction of Training Data Using Parallel Hyperplane for Support Vector Machine](https://www.tandfonline.com/doi/full/10.1080/08839514.2019.1583449?scroll=top&needAccess=true)
 
 
-## notes on the algorithms used 
 
-Epsilon-greedy algorithm 
-### Choosing support vectors 
-The goal  of the project is to choose the data points coming in from the peripheral nodes most efficiently. This involves choosing the points that would change the hyperplane the most- these would be the support vectors for the current hyperplane separating the points. 
-
-### Approaching the problem 
-### Using Clusters
-
-
-### Algorithm 1 - Epsilon greedy sampling 
-Send a certain number of samples at the beginning to get an initial hyperplane. After the initial batch of points are sent uncritically, the peripheral nodes use this initial classifier to classify every incoming point. The classification output is either -1 or 1 if the hyperplane is able to classify the point into a separable class, the point lies in the p1 or p2 region of this hyperplane (outside the margin area) - it is not a support vector and it reinforces the current hyperplane. It is sent to the central node with a probability $\epsilon_{out}$.  If the classifier incorrectly classifies the point (say -1 as 1) the point, but the point is not in the margin region of the SVM it is sent to the central node with a probability $1-\epsilon_{out}$ . If the output of the classifier function is not -1 or 1 i.e it was not able to classify the data point into one of the 2 classes, it is lies between the two margins of the SVM, a support vector [sic], it influences the hyperplane formation and is sent to the central node with a probability $\epsilon_{sv}$.
-
-This algorithm is based on the simple understanding that the the support vectors influence the hyperplane more, and that incorrectly classified points should also be accounted for in the hyperplane formation and sent to the central node so we can improve it. 
-
-But we need to do better. 
-
-Check 2.4.4 Stochastic Gradient Descent for the Soft-SVM Problem in this link
-https://scholarscompass.vcu.edu/cgi/viewcontent.cgi?article=5368&context=etd
-### 
