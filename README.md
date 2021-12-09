@@ -1,6 +1,10 @@
 # 236A-LP-Project
 ## Group 25: Tejas Viswanath, Harish Gondihalli Venkatesha, Jhancy Rani Ramamurthy, Anwesha Chattoraj and Vishwas M Shetty
 
+## Report:
+Please refer to the report for the theory of the project:
+https://www.overleaf.com/read/nphhyqkkyyps
+
 ## Prerequisites:
 - Python environment with python version 3.0 or higher
 - (Optional) iPython IDE like Jupyter Labs, Jupyter Notebook, etc
@@ -33,25 +37,20 @@
 
 ## Part 2:
 
-Please note that we have implemented the ILP using numpy, instead of using cvxpy.
-
-## Script details
-- `classifier_Part2.py`: Implementation of all the functions. The function ILP() in this script is our ILP implementation. As stated before, we have not used cvxpy - formulate this LP problem, instead we have used numpy.
-- `GaussianGen.py`: Script to generate the synthetic dataset samples.
-- `main_part2.py`: The top level script tobe run.
-
-## Executing the script
-- Parameters to be set in main_part2.py
-1. `DatasetToBeUsed`: `mnist` or `gaussian` 
-2. `class1` and `class2`: Labels that you want to classify. In case of Gaussian, please set `class1` to 1 and `class2` to -1.
-3. `lambd`: Value of the regulariation parameter.
-4. `mean1`, `mean2`, `cov1`, and `cov2`: Mean and Covariance matrix values. This is if using Gaussian dataset.
-5. `NoOfSamples`: Number of samples to be generated per (mean1,cov1) and (mean2, cov2) combination. This is if using Gaussian dataset.
-6. `FracOfTest`: Fraction of (mean1,cov1) and (mean2, cov2) to be set aside as test set. This is if using Gaussian dataset.
-7. `dataset` and `test_dataset`: Update paths as per your folder structure.
-
-## Running script:
-`python main_part2.py`
+- Please note that we have implemented the ILP using numpy, instead of using cvxpy.
+- Inside `Part2` folder, we have:
+  - `classifier_Part2.py`: Implementation of all the functions. The function ILP() in this script is our ILP implementation. As stated before, we have not used cvxpy - formulate this LP problem, instead we have used numpy.
+  - `GaussianGen.py`: Script to generate the synthetic dataset samples.
+  - `main_part2.py`: The top level script to be run.
+- Following are the parameters to be set in `main_part2.py`:
+  1. `DatasetToBeUsed`: `mnist` or `gaussian` 
+  2. `class1` and `class2`: Labels that you want to classify. In case of Gaussian, please set `class1` to 1 and `class2` to -1.
+  3. `lambd`: Value of the regulariation parameter.
+  4. `mean1`, `mean2`, `cov1`, and `cov2`: Mean and Covariance matrix values. This is if using Gaussian dataset.
+  5. `NoOfSamples`: Number of samples to be generated per (mean1,cov1) and (mean2, cov2) combination. This is if using Gaussian dataset.
+  6. `FracOfTest`: Fraction of (mean1,cov1) and (mean2, cov2) to be set aside as test set. This is if using Gaussian dataset.
+  7. `dataset` and `test_dataset`: Update paths as per your folder structure.
+- To execute part 2, run the file - `python main_part2.py`
 
 ## notes on the algorithms used 
 
