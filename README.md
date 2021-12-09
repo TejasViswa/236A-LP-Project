@@ -1,13 +1,6 @@
 # 236A-LP-Project
 ## Group 25: Tejas Viswanath, Harish Gondihalli Venkatesha, Jhancy Rani Ramamurthy, Anwesha Chattoraj and Vishwas M Shetty
 
-## Useful Links:
-- [Binary Classifer](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset)
-- [SVM Classifier from scratch](https://towardsdatascience.com/svm-implementation-from-scratch-python-2db2fc52e5c2)
-- https://link.springer.com/article/10.1007%2Fs13755-017-0023-z
-- https://towardsdatascience.com/the-5-sampling-algorithms-every-data-scientist-need-to-know-43c7bc11d17c
-- https://bmcmedinformdecismak.biomedcentral.com/articles/10.1186/1472-6947-12-8
-
 ## Prerequisites:
 - Python environment with python version 3.0 or higher
 - iPython IDE like Jupyter Labs, Jupyter Notebook, etc
@@ -19,11 +12,25 @@
   - `pip install matplotlib`
 - seaborn Module
   - `pip install seaborn`
-- sklearn Module
-  - `pip install sklearn`
+- cvxpy Module
+  - `pip install cvxpy`
 - Download all the files in the folder and keep them in the same workspace
 - Also download the [MNIST Train Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=train.csv) and [MNIST Test Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=test.csv) and keep them in the same workspace
-- Run the `Untitled2.ipynb` file on your ipython IDE
+
+## Part 1:
+- The `classifier_25.py` is our SVM binary classifier file. Once instantied as an object, it also performs random sample selection and trains itself. The weights and bias are contained in `self.w` and `self.b`.
+- The classifier contains 3 main algorithms which are:
+  1. Random Percentage sampling:
+  2. Epsilon Greedy Sampling:
+  3. Error Sampling:
+- Run the `main.py` file on your ipython IDE to see the performance of the classifier. You can also see the same performance already plotted in `performance_analysis.ipynb` file.
+
+## Useful Links:
+- [Binary Classifer](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset)
+- [SVM Classifier from scratch](https://towardsdatascience.com/svm-implementation-from-scratch-python-2db2fc52e5c2)
+- https://link.springer.com/article/10.1007%2Fs13755-017-0023-z
+- https://towardsdatascience.com/the-5-sampling-algorithms-every-data-scientist-need-to-know-43c7bc11d17c
+- https://bmcmedinformdecismak.biomedcentral.com/articles/10.1186/1472-6947-12-8
 
 ## References
 - https://github.com/sdeepaknarayanan/Machine-Learning/blob/master/Assignment%207/HW7_SVM.ipynb  
