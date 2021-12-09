@@ -3,7 +3,7 @@
 
 ## Prerequisites:
 - Python environment with python version 3.0 or higher
-- iPython IDE like Jupyter Labs, Jupyter Notebook, etc
+- (Optional) iPython IDE like Jupyter Labs, Jupyter Notebook, etc
 - Numpy Module (Run these exact commands on the command prompt of the specific environment[eg:anaconda terminal if applicable])
   - `pip install numpy`
 - pandas Module
@@ -14,8 +14,8 @@
   - `pip install seaborn`
 - cvxpy Module
   - `pip install cvxpy`
-- Download all the files in the folder and keep them in the same workspace
-- Also download the [MNIST Train Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=train.csv) and [MNIST Test Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=test.csv) and keep them in the same workspace
+- Download all the files in the folder and keep them in the same workspace.
+- Also download the [MNIST Train Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=train.csv) and [MNIST Test Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=test.csv) and keep them in the same workspace as the `classifier.py`.
 
 ## Execution:
 ## Part 1:
