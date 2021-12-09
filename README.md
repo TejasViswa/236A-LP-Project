@@ -1,6 +1,9 @@
 # 236A-LP-Project
 ## Group 25: Tejas Viswanath, Harish Gondihalli Venkatesha, Jhancy Rani Ramamurthy, Anwesha Chattoraj and Vishwas M Shetty
 
+## Report:
+https://www.overleaf.com/read/nphhyqkkyyps
+
 ## Prerequisites:
 - Python environment with python version 3.0 or higher
 - (Optional) iPython IDE like Jupyter Labs, Jupyter Notebook, etc
