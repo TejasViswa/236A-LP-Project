@@ -47,7 +47,7 @@ Please note that we have implemented the ILP using numpy, instead of using cvxpy
 3. `lambd`: Value of the regulariation parameter.
 4. `mean1`, `mean2`, `cov1`, and `cov2`: Mean and Covariance matrix values. This is if using Gaussian dataset.
 5. `NoOfSamples`: Number of samples to be generated per (mean1,cov1) and (mean2, cov2) combination. This is if using Gaussian dataset.
-6. `FracOfTest`: Fraction of (mean1,cov1) and (mean2, cov2) to be set aside as test set.
+6. `FracOfTest`: Fraction of (mean1,cov1) and (mean2, cov2) to be set aside as test set. This is if using Gaussian dataset.
 7. `dataset` and `test_dataset`: Update paths as per your folder structure.
 
 ## Running script:
