@@ -30,7 +30,7 @@
   -  `algorithm` is the algorithm number which can be 1, 2 and 3 based on desired algorithm as described in previous point.
 - Run the `main.py` file inside `Part1` folder on your ipython IDE to see the performance of the classifier. You can also see the same performance already plotted in `performance_analysis.ipynb` file.
 
-##Part 2:
+## Part 2:
 
 ## notes on the algorithms used 
 
