@@ -17,6 +17,7 @@
 - Download all the files in the folder and keep them in the same workspace
 - Also download the [MNIST Train Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=train.csv) and [MNIST Test Dataset](https://www.kaggle.com/lailaelmahmoudi123/binary-classification-for-the-mnist-dataset/data?select=test.csv) and keep them in the same workspace
 
+## Execution:
 ## Part 1:
 - The `classifier_25.py` is our SVM binary classifier file. Once instantied as an object, it also performs random sample selection and trains itself. The weights and bias are contained in `self.w` and `self.b`.
 - The classifier contains 3 main algorithms which are:
