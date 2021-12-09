@@ -2,6 +2,7 @@
 ## Group 25: Tejas Viswanath, Harish Gondihalli Venkatesha, Jhancy Rani Ramamurthy, Anwesha Chattoraj and Vishwas M Shetty
 
 ## Report:
+Please refer to the report for the theory of the project:
 https://www.overleaf.com/read/nphhyqkkyyps
 
 ## Prerequisites:
