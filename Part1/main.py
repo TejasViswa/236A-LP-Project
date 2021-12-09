@@ -6,7 +6,7 @@ import matplotlib as mpl
 import seaborn as sns
 
 # Load the entire dataset in csv format
-dataset = pd.read_csv('mnist/mnist_train.csv')
+# dataset = pd.read_csv('mnist/mnist_train.csv')
 mnist_train = pd.read_csv("mnist/mnist_train.csv")
 
 # Load the test data path
