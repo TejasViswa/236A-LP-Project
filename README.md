@@ -1,9 +1,6 @@
 # 236A-LP-Project
 ## Group 25: Tejas Viswanath, Harish Gondihalli Venkatesha, Jhancy Rani Ramamurthy, Anwesha Chattoraj and Vishwas M Shetty
 
-## Report:
-https://www.overleaf.com/read/nphhyqkkyyps
-
 ## Prerequisites:
 - Python environment with python version 3.0 or higher
 - (Optional) iPython IDE like Jupyter Labs, Jupyter Notebook, etc
@@ -36,7 +33,7 @@ https://www.overleaf.com/read/nphhyqkkyyps
 
 ## Part 2:
 
-Please note that we have implemented the ILP using numpy, instead of using cvxpy. The details of our ILP formulation can be found in the report submitted.
+Please note that we have implemented the ILP using numpy, instead of using cvxpy.
 
 ## Script details
 - `classifier_Part2.py`: Implementation of all the functions. The function ILP() in this script is our ILP implementation. As stated before, we have not used cvxpy - formulate this LP problem, instead we have used numpy.
