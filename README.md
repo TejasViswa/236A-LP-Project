@@ -24,7 +24,8 @@
   1. Random Percentage sampling: Random sampling of data based on perentage
   2. Epsilon Greedy Sampling: Greedy Sampling based on region and prediction
   3. Error Sampling: Sampling based on incorrect predictions
-- To instantiate an object of classifier class, run it as `my_clf = classifier_25(dataset,class1,class2,algorithm)` where:
+- To instantiate an object of classifier class, run it as `my_clf = classifier_25(dataset,class1,class2,algorithm)`,
+  where:
   - `dataset` is the input data dataset
   - `class1` and `class2` are the labels for the two classes. (eg: 1 and 7, 4 and 9 for MNIST and 1 and -1 for synthetic)
   -  `algorithm` is the algorithm number which can be 1, 2 and 3 based on desired algorithm as described in previous point.
