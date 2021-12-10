@@ -32,7 +32,7 @@ class MyClassifier_25:
         # Debug Mode - Executes print statements if true
         self.debug_mode = False
         
-        # Algorithms:
+        # Algorithms: Change algo_sel to choose algorithmm
         # 1.Percentage Random Batch Sampling
         # 2.Epsilon Greedy Sampling
         # 3.Error Sampling
@@ -60,7 +60,7 @@ class MyClassifier_25:
         
         # Error Sampling Variables:
         # his algo will collect (sampling_requirement + 1) no. of samples
-        self.initial_e_sample_size = 75
+        self.initial_e_sample_size = 2
         self.err_val_chck_till = 10
         self.e_sampling_requirement = 1000
         self.e_update = 2   

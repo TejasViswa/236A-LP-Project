@@ -7,19 +7,19 @@ import seaborn as sns
 
 # Load the entire dataset in csv format
 # dataset = pd.read_csv('mnist/mnist_train.csv')
-mnist_train = pd.read_csv("mnist_train.csv")
+mnist_train = pd.read_csv("Part1/mnist/mnist_train.csv")
 
 # Load the test data path
 # test_dataset = pd.read_csv('mnist/mnist_test.csv')
-mnist_test = pd.read_csv("mnist_test.csv")
+mnist_test = pd.read_csv("Part1/mnist/mnist_test.csv")
 
 #Take copies of the master dataframes
 train = mnist_train.copy()
 tester = mnist_test.copy()
 
 # Change Classes to Test here MNIST
-class1 = 4
-class2 = 9
+class1 = 1
+class2 = 7
 
 tester = tester.loc[tester['label'].isin([class1,class2])]
 
@@ -60,9 +60,12 @@ def average_testing_across_multiple_classifiers(dataset = train, cls1 = class1, 
         print("Avg:",avg)
 
 if __name__ == "__main__":
-#     classfier =  MyClassifier_25(train,class1,class2)
-#     print("trained")
-#     results, performance = classfier.test(test_rdm)
-#     print("Correctly classified ",performance)
-#     x,y = classfier.plot_classifier_performance_vs_number_of_samples(tester)
-    average_testing_across_multiple_classifiers()
+# To run one classifier =================================================================
+    classfier =  MyClassifier_25(train,class1,class2)
+    print("trained")
+    results, performance = classfier.test(test_rdm)
+    print("Correctly classified ",performance)
+    x,y = classfier.plot_classifier_performance_vs_number_of_samples(tester)
+
+#  To get average across all algorithms and 10 classifiers ============================
+    # average_testing_across_multiple_classifiers()
