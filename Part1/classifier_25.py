@@ -55,8 +55,7 @@ class MyClassifier_25:
         # Epsilon Greedy Sampling Variables:
         # This algo will collect (sampling_requirement + 1) no. of samples
         self.initial_sample_size = 2
-        self.epsilon_out = 0.4
-        self.epsilon_sv = 0.7
+        self.epsilon_out = 0.8
         self.sampling_requirement = 50
         
         # Error Sampling Variables:

@@ -30,7 +30,7 @@ train_rdm = train.sample(frac = 0.5)
 test_rdm = train.sample(frac = 0.2)
 
 
-def average_testing_across_multiple_classifiers(num = 5, min_len= 10):
+def average_testing_across_multiple_classifiers(train,num = 5, min_len= 10):
     # Testing the Algorithm performance by averaging from 10 classifiers
     num = 5
     min_len = 100
@@ -41,6 +41,7 @@ def average_testing_across_multiple_classifiers(num = 5, min_len= 10):
         for j in range (num):
             my_clf = MyClassifier_25(train,4,9,i)
             x,y = my_clf.plot_classifier_performance_vs_number_of_samples(tester,False)
+    
             if avg is None:
                 avg = y
             else:
@@ -59,9 +60,9 @@ def average_testing_across_multiple_classifiers(num = 5, min_len= 10):
         print("Avg:",avg)
 
 if __name__ == "__main__":
-    classfier =  MyClassifier_25(train,class1,class2)
-    print("trained")
-    results, performance = classfier.test(test_rdm)
-    print("Correctly classified ",performance)
-    x,y = classfier.plot_classifier_performance_vs_number_of_samples(tester)
+    # classfier =  MyClassifier_25(train,class1,class2)
+    # print("trained")
+    # results, performance = classfier.test(test_rdm)
+    # x,y = classfier.plot_classifier_performance_vs_number_of_samples(tester)
+    average_testing_across_multiple_classifiers(train)
     
