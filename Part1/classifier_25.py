@@ -472,7 +472,8 @@ class MyClassifier_25:
         print("x",x) if self.debug_mode is True else None
         if to_plot == True:
             plt.plot(x,y)
-        
+            plt.title('Algorithm {}'.format(self.algo_sel))
+            plt.show()
         return x,y
 
     def f(self,test_input,w=None,b=None):
