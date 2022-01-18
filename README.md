@@ -1,5 +1,5 @@
-# 236A-LP-Project
-## Group 25: Tejas Viswanath, Harish Gondihalli Venkatesha, Jhancy Rani Ramamurthy, Anwesha Chattoraj and Vishwas M Shetty
+# SVM Binary Classifier - Determining Useful Samples and Clustering
+## Tejas Viswanath, Harish Gondihalli Venkatesha, Jhancy Rani Ramamurthy, Anwesha Chattoraj and Vishwas M Shetty
 
 ## Report:
 Please refer to the report for the theory of the project:
